@@ -3,7 +3,7 @@
     -> Login
     -> Logout
     -> Profile
-        -> Image
+        -> Image -> Media server of some kind?
         -> Bio
         -> Education
         -> Followers + Followed profiles
@@ -22,6 +22,7 @@
         -> Description
         -> Author
         -> Tags
+        -> Image -> Storing images?
     -> Deleting
     -> Updating
     -> Commenting
