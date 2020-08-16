@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block headtitle %}Articles{% endblock %}
+{% block content %}
+{% with articles.count as total_articles %}
+<h2>
+   Total articles: {{ total_articles }} article{{ total_articles|pluralize }}
+</h2>
+{% endwith %}
+{% for article in articles %}
+<div class="mb-4" id="article-{{article.id}}">
+    <h3>
+        <a href="{% url "articles:article_detail" article.id article.slug %}">
+      {{article.title}}
+        </a>
+    </h3>
+    <p>{{article.description}}</p>
+    <p>{{article.created_at}}</p>
+</div>
+{% empty %}
+<p>There are no articles yet.</p>
+{% endfor %}
+
+{% endblock content %}

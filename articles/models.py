@@ -7,7 +7,6 @@ class Article(models.Model):
     slug = AutoSlugField(('slug'), max_length=50, unique=True, populate_from=('title',))
     description = models.CharField(max_length=300)
     content = models.TextField()
-
     # blank = True means not required in Django
     # null = True means not required in the database
     cover_image = models.ImageField(upload_to="images/article-cover/", blank=True, null=True)
