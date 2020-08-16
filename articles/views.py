@@ -15,5 +15,7 @@ def article_list(request):
 
 def article_detail(request, article_id, article_slug):
     article = get_object_or_404(Article, id=article_id, slug=article_slug)
-    return render(request, "articles/detail.html", context={"article": article})
+    comments = article.comments.all()
+    return render(request, "articles/detail.html", context={"article": article, 
+                                                            "comments": comments})
     # return HttpResponse("<h1>This is article {} - {} - {} by author {}</h1>".format(obj.id, obj.title, obj.description, obj.author))

@@ -1,8 +1,22 @@
 {% extends 'base.html' %}
 {% block headtitle %}{{ article.title }}{% endblock %}
 {% block content %}
-    <h1> {{ article.title }}</h1>
-    Posted at <i>{{ article.created_at }}</i>
-    <h2> {{ article.description }}</h2>
-    <p>{{ article.content}} </p>
+<h1> {{ article.title }}</h1>
+Posted at <i>{{ article.created_at }}</i>
+<h4> {{ article.description }}</h4>
+{% autoescape off %}
+<p>{{ article.content}} </p>
+{% endautoescape %}
+<h2>Comments</h2>
+{% for comment in comments %}
+<div class="comment">
+    <p class="info">
+        Comment {{ forloop.counter }} by {{ comment.author.user }}
+        {{ comment.created }}
+    </p>
+    {{ comment.body|linebreaks }}
+</div>
+{% empty %}
+<p>There are no comments yet.</p>
+{% endfor %}
 {% endblock content %}
