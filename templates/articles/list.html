@@ -1,23 +1,47 @@
 {% extends 'base.html' %}
 {% block headtitle %}Articles{% endblock %}
 {% block content %}
-{% with articles.count as total_articles %}
-<h2>
-   Total articles: {{ total_articles }} article{{ total_articles|pluralize }}
-</h2>
-{% endwith %}
-{% for article in articles %}
-<div class="mb-4" id="article-{{article.id}}">
-    <h3>
-        <a href="{% url "articles:article_detail" article.id article.slug %}">
-      {{article.title}}
-        </a>
-    </h3>
-    <p>{{article.description}}</p>
-    <p>{{article.created_at}}</p>
+
+<div class="container mt-5">
+    <div class="row">
+        {% for article in articles %}
+		<div class="container">
+   			<div class="row">
+   				<div class="col-md-12">
+   					<div class="case">
+   						<div class="row">
+   							<div class="col-md-6 col-lg-6 col-xl-8 d-flex">
+   								<a href='{% url "articles:article_detail" article.id article.slug %}' class="img w-100 mb-3 mb-md-0" style="background-image: {% if article.cover_image %}url(https://colorlib.com/preview/theme/readit/images/image_1.jpg){% else %} url(https://colorlib.com/preview/theme/readit/images/image_2.jpg){% endif %};"></a>
+							</div>
+   							<div class="col-md-6 col-lg-6 col-xl-4 d-flex">
+   								<div class="text w-100 pl-md-3 article-tab-text">
+										<div class="text-area">
+											<h2 class="article-title"><a href='{% url "articles:article_detail" article.id article.slug %}'>{{article.title}}</a></h2>
+											<p class="subheading">{{article.description}}</p>
+										</div>
+											<div class="author">
+   											<p class="mb-0">
+											   
+										   	<a href="#">{{ article.author.user}}</a></p>
+   										</div>
+										<div class="meta">
+   											<p class="mb-0">
+										   	<a href="#">{{ article.created_at|date:"D d F Y" }}</a></p>
+   										</div>
+									
+   								</div>
+   							</div>
+   						</div>
+   					</div>
+                </div>
+			</div>
+		</div>
+        {% empty %}
+        <p>There are no articles yet.</p>
+        {% endfor %}
+    </div>
 </div>
-{% empty %}
-<p>There are no articles yet.</p>
-{% endfor %}
+{% include "components/pagination.html" with page=articles %}
+
 
 {% endblock content %}

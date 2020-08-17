@@ -1,22 +1,39 @@
 {% extends 'base.html' %}
 {% block headtitle %}{{ article.title }}{% endblock %}
 {% block content %}
-<h1> {{ article.title }}</h1>
-Posted at <i>{{ article.created_at }}</i>
-<h4> {{ article.description }}</h4>
-{% autoescape off %}
-<p>{{ article.content}} </p>
-{% endautoescape %}
-<h2>Comments</h2>
+<div class="row mt-4">
+    <div class="col-12 center">
+        <div class="title text-center mb-4 border-bottom">
+            <h2 class="article-title"> {{ article.title }}</h2>
+            <div class="date text-right">
+                Posted at <i>{{ article.created_at|date:"D d F Y f A" }}</i>
+            </div>
+        </div>
+        <div class="col-10 description mb-3 center">
+            <h4> {{ article.description }}</h4>
+        </div>
+        <div class="col-10 center content">
+            {% autoescape off %}
+            <p>{{ article.content}} </p>
+            {% endautoescape %}
+        </div>
+    </div>
+</div>
+<div class="container">
+    <h2>Comments</h2>
+<div class="row">
 {% for comment in comments %}
-<div class="comment">
+<div class="col-12 border rounded mx-auto py-3 mb-3">
     <p class="info">
-        Comment {{ forloop.counter }} by {{ comment.author.user }}
+        Comment {{ forloop.counter }} by {{ comment.author.user }} at {{ comment.created_at}}
         {{ comment.created }}
     </p>
     {{ comment.body|linebreaks }}
 </div>
 {% empty %}
 <p>There are no comments yet.</p>
+</div>
+</div>
 {% endfor %}
 {% endblock content %}
+

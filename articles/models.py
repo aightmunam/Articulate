@@ -1,5 +1,6 @@
 from django.db import models
 from django_extensions.db.fields import AutoSlugField
+import os
 
 # Create your models here.
 class Article(models.Model):
@@ -19,6 +20,7 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
 
 
 class Tag(models.Model):
