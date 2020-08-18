@@ -1,4 +1,4 @@
-<nav class="navbar px-md-0 navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+<nav class="navbar px-md-0 navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light mb-5" id="ftco-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">Artic<i>ulate</i>.</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
@@ -8,7 +8,8 @@
     <div class="collapse navbar-collapse" id="ftco-nav">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item active"><a href="/" class="nav-link">Home</a></li>
-        <li class="nav-item"><a href="{%url "articles:article_list" %}" class="nav-link">Articles</a></li>
+        <li class="nav-item active"><a href="{%url "articles:article_list" %}" class="nav-link">Articles</a></li>
+        <li class="nav-item active"><a href="{%url "articles:article_create_new" %}" class="nav-link">New Article</a></li>
       </ul>
     </div>
   </div>

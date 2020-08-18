@@ -19,6 +19,6 @@ from articles.views import aritcle_index
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', aritcle_index),
+    path('', aritcle_index, name='index'),
     path('articles/', include('articles.urls', namespace='articles'))
 ]

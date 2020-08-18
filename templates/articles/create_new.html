@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block headtitle %}Create new article{% endblock %}
+{% block content %}
+{% include "components/form.html" with form=article_form heading_text="Create a new Article" button_text="Publish Article" %}
+{% endblock %}

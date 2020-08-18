@@ -119,6 +119,12 @@ a:hover {
     text-decoration: none;
 }
 
+.author a{
+    color: #e2b03a !important;
+    font-size: 24px;
+    text-decoration: none;
+}
+
 .case .text .meta p {
     font-size: 12px;
     color: rgba(0, 0, 0, 0.2);
@@ -130,4 +136,47 @@ a:hover {
 
 .pagination {
     padding:2px
+}
+
+.btn.btn-primary {
+    background-color: #ffd369 !important;
+    border: 1px solid #ffd369 !important;
+    color: #fff !important;
+}
+
+.current .text-yellow {
+    color: #ffd369 !important;
+}
+
+.form-control input{
+    align-self: center;
+}
+
+.banner {
+	padding: 3rem 0 2rem 0;
+}
+
+.banner h1 {
+	font-size: 2.8rem;
+}
+
+.banner .btn {
+	opacity: 0.8;
+}
+
+.banner .btn:hover {
+	transition: 0.1s all;
+	opacity: 1;
+}
+
+.banner .post-meta {
+	margin: 2rem 0 0 0;
+}
+
+.banner .post-meta .author {
+	color: #fff;
+}
+
+.comment-text {
+    font-size: 5rem !important;
 }

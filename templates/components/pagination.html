@@ -1,11 +1,11 @@
-<div class="container pagination">
-    <div class="row justify-content-center">
-        <div class="col align-self-center border rounded py-3 mb-3">
+<div class="container pagination d-flex justify-content-center">
+    <div class="row">
+        <div class="col border rounded py-3 mb-3">
             <span class="step-links">
                 {% if page.has_previous %}
                 <a href="?page={{ page.previous_page_number }}">Previous</a>
                 {% endif %}
-                <span class="current">
+                <span class="current text-yellow">
                     Page {{ page.number }} of {{ page.paginator.num_pages }}.
                 </span>
                 {% if page.has_next %}

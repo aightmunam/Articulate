@@ -1,39 +1,57 @@
 {% extends 'base.html' %}
 {% block headtitle %}{{ article.title }}{% endblock %}
 {% block content %}
-<div class="row mt-4">
-    <div class="col-12 center">
-        <div class="title text-center mb-4 border-bottom">
+<div class="row d-flex justify-content-center border-bottom mb-3">
+    <div class="col-12 article-banner">
+        <div class="title text-center text-capitalize mb-4">
             <h2 class="article-title"> {{ article.title }}</h2>
-            <div class="date text-right">
-                Posted at <i>{{ article.created_at|date:"D d F Y f A" }}</i>
+        </div>
+    </div>
+    <div class="col-7 text-center">
+        By @<a class="text-primary" href="#">{{article.author}}</a>
+    </div>
+    <div class="col-6 text-center">
+        <p>Posted at <i class="text-secondary">{{ article.created_at|date:"D d F Y f A" }}</i></p>
+    </div>
+</div>
+
+<div class="row d-d-flex justify-content-center">
+    <div class="col-5 mb-5">
+        <img class="img-fluid rounded mx-auto d-block"
+            src="https://colorlib.com/preview/theme/readit/images/image_1.jpg" alt="">
+    </div>
+</div>
+
+<div class="row d-flex justify-content-center">
+    <div class="col-8 description text-center mb-3">
+        <h4> {{ article.description }}</h4>
+    </div>
+    <div class="col-8">
+        {% autoescape off %}
+        <p>{{ article.content}} </p>
+        {% endautoescape %}
+    </div>
+</div>
+<div class="container mt-5 border mb-4 rounded">
+    <div class="col-12">
+        <div class="d-flex justify-content-center">
+            <h2 class="article-title">Comments</h2>
+        </div>
+        {% include "components/form.html" with form=comment_form button_text="Add comment"%}
+        <div class="row">
+            {% for comment in comments %}
+            <div class="col-12 border rounded mx-auto py-3 mb-3">
+                <p class="comment-text">
+                    {{ comment.body|linebreaks }}
+                </p>
+                <p class="info">
+                    <a class="text-primary" href="#">{{ article.author}}</a> <span class="text-secondary">at {{ comment.created_at}}</span>
+                </p>
             </div>
-        </div>
-        <div class="col-10 description mb-3 center">
-            <h4> {{ article.description }}</h4>
-        </div>
-        <div class="col-10 center content">
-            {% autoescape off %}
-            <p>{{ article.content}} </p>
-            {% endautoescape %}
+            {% empty %}
+            <p>There are no comments yet.</p>
         </div>
     </div>
 </div>
-<div class="container">
-    <h2>Comments</h2>
-<div class="row">
-{% for comment in comments %}
-<div class="col-12 border rounded mx-auto py-3 mb-3">
-    <p class="info">
-        Comment {{ forloop.counter }} by {{ comment.author.user }} at {{ comment.created_at}}
-        {{ comment.created }}
-    </p>
-    {{ comment.body|linebreaks }}
-</div>
-{% empty %}
-<p>There are no comments yet.</p>
-</div>
-</div>
 {% endfor %}
 {% endblock content %}
-
