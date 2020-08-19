@@ -1,0 +1,50 @@
+<div class="container border p-3 mb-3">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="case">
+                <div class="row">
+                    <div class="col-md-6 col-lg-6 col-xl-8 d-flex">
+                        <a href='{% url "articles:article_detail" article.id article.slug %}'
+                            class="img w-100 mb-3 mb-md-0"
+                            style="background-image: {% if article.cover_image %}url(https://colorlib.com/preview/theme/readit/images/image_1.jpg){% else %} url(https://colorlib.com/preview/theme/readit/images/image_2.jpg){% endif %};"></a>
+                    </div>
+                    <div class="col-md-6 col-lg-6 col-xl-4 d-flex">
+                        <div class="row d-flex text w-100 pl-md-3 ">
+                            <div class="align-content-start">
+                                <div class="mb-2">
+                                    <h2 class="article-title">
+                                        <a href='{% url "articles:article_detail" article.id article.slug %}'>
+                                            {{article.title}}
+                                        </a>
+                                    </h2>
+                                </div>
+                                <div class="author mb-4">
+                                    <p class="mb-0">
+                                    @<a href="#"><mark class="text-primary">{{ article.author}}</mark></a></p>
+                                </div>
+                                <div class="mb-4">
+                                    <p class="subheading">{{article.description}}</p>
+                                </div>
+                                <div class="mb-4">
+                                    {% if article.tags %}
+                                    Tags:
+                                    {% for tag in article.tags.all %}
+                                    <a class="text-primary" href="{% url "articles:article_list_by_tag" tag.slug %}">
+                                        {{ tag.name }}
+                                    </a>
+                                    {% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="meta align-self-end">
+                                <p class="mb-0">
+                                    <a href="#">{{ article.created_at|date:"D d F Y" }}</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

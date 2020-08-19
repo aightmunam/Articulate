@@ -2,42 +2,25 @@
 {% block headtitle %}Articles{% endblock %}
 {% block content %}
 
-<div class="container mt-5">
-    <div class="row">
+<div class="row d-flex justify-content-center border-bottom pt-3 mb-3 bg-dark">
+    <div class="col-6 ">
+            {% include "components/form.html" with form=search_form form_method="get" button_text="Search"%}
+    </div>
+</div>
+
+<div class="container">
+    {% if query %}
+    <div class="row d-flex justify-content-center">
+        <p>Showing results for <span class="text-primary">{{query}}</span></p>
+    </div>
+    {% endif %}
+    <div class="row d-flex justify-content-center border-top">
         {% for article in articles %}
-		<div class="container">
-   			<div class="row">
-   				<div class="col-md-12">
-   					<div class="case">
-   						<div class="row">
-   							<div class="col-md-6 col-lg-6 col-xl-8 d-flex">
-   								<a href='{% url "articles:article_detail" article.id article.slug %}' class="img w-100 mb-3 mb-md-0" style="background-image: {% if article.cover_image %}url(https://colorlib.com/preview/theme/readit/images/image_1.jpg){% else %} url(https://colorlib.com/preview/theme/readit/images/image_2.jpg){% endif %};"></a>
-							</div>
-   							<div class="col-md-6 col-lg-6 col-xl-4 d-flex">
-   								<div class="text w-100 pl-md-3 article-tab-text">
-										<div class="text-area">
-											<h2 class="article-title"><a href='{% url "articles:article_detail" article.id article.slug %}'>{{article.title}}</a></h2>
-											<p class="subheading">{{article.description}}</p>
-										</div>
-										<div class="author">
-   											<p class="mb-0">
-											   
-										   	<a href="#">{{ article.author}}</a></p>
-   										</div>
-										<div class="meta">
-   											<p class="mb-0">
-										   	<a href="#">{{ article.created_at|date:"D d F Y" }}</a></p>
-   										</div>
-									
-   								</div>
-   							</div>
-   						</div>
-   					</div>
-                </div>
-			</div>
-		</div>
+			{% include "components/card.html" with article=article %}
         {% empty %}
-        <p>There are no articles yet.</p>
+        <div class="col-8 text-center m-5 h3">
+            <p>There are no articles yet.</p>
+        </div>
         {% endfor %}
     </div>
 </div>

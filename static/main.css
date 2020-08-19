@@ -2,6 +2,7 @@ body {
     font-family: "Poppins", Arial, sans-serif;
     background: #fff;
     font-size: 16px;
+    padding: 0px;
     line-height: 1.8;
     font-weight: 400;
     color: #212529;
@@ -81,10 +82,9 @@ a:hover {
 .article-title a {
     display: block;
     font-weight: 700;
-    font-size: 45px;
+    font-size: 36px;
     font-family: "Poppins", Arial, sans-serif;
     color: #000000;
-    margin-bottom: 5px;
 }
 
 .meta p a {
@@ -101,9 +101,6 @@ a:hover {
     height: 400px;
 }
 
-.case .text .text-area {
-    margin-bottom: 20px;
-}
 
 .case .text .subheading {
     font-weight: 500;
@@ -115,7 +112,7 @@ a:hover {
 
 .case .text .author a {
     color: #e2b03a;
-    font-size: 24px;
+    font-size: 20px;
     text-decoration: none;
 }
 
@@ -179,4 +176,11 @@ a:hover {
 
 .comment-text {
     font-size: 5rem !important;
+}
+
+#profile-img {
+    vertical-align: middle !important;
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
 }

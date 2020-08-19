@@ -1,13 +1,17 @@
-<div class="d-flex justify-content-center mb-5">
-    <h2 class="article-title">{{heading_text}}</h2>
+{% if heading_text %}
+<div class="d-flex justify-content-center mt-4 mb-5">
+    <h2 class="article-title text-primary">{{heading_text}}</h2>
 </div>
+{% endif %}
 <div class="row justify-content-center">
 <div class="col-md-6 col-xs-8 ">
-<form method="post">
+<form method="{{form_method}}">
+    {% ifequal form_method "post" %}
     {% csrf_token %}
+    {% endifequal %}
     {{ form.as_p }}
-    <div class="d-flex justify-content-end">
-        <button type="submit" class="btn btn-primary mb-4 px-4 py-2">{{button_text}}</button>
+    <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-primary btn-sm mb-4 px-4 py-2">{{button_text}}</button>
     </div>
 </form>
 </div>
