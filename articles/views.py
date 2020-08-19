@@ -4,7 +4,7 @@ from django.db.models import Count
 from django.core.paginator import Paginator, EmptyPage,\
     PageNotAnInteger
 from django.conf import settings
-from django.contrib.postgres.search import SearchVector
+from django.contrib.postgres.search import TrigramSimilarity
 
 from .models import Article, Tag
 from .forms import ArticleForm, CommentForm, SearchForm
@@ -15,15 +15,15 @@ def aritcle_index(request):
 
 def article_list(request, tag_slug=None):
     object_list = Article.objects.all().order_by('-created_at')
-    tag = None
     search_form = SearchForm()
+    tag = None
     query = None
 
     if 'query' in request.GET:
         search_form = SearchForm(request.GET)
         if search_form.is_valid():
             query = search_form.cleaned_data['query']
-            object_list = Article.objects.annotate(search=SearchVector('title', 'description', 'content'),).filter(search=query)
+            object_list = Article.objects.annotate(similarity=TrigramSimilarity('title', query),).filter(similarity__gt=0.1).order_by('-similarity')
 
     if tag_slug:
         tag = get_object_or_404(Tag, slug=tag_slug)
