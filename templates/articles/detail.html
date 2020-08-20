@@ -11,15 +11,48 @@
     <div class="col-12 text-center mb-2">
         <img src="http://i.imgur.com/Qr71crq.jpg" style="vertical-align:middle;width: 80px;height: 80px;border-radius: 50%;" class="avatar" />
     </div>
-    <div class="col-7 text-center text-light">
-        By @<a class="text-primary" href="#">{{article.author}}</a>
+    <div class="col-7 text-center text-secondary">
+        <span class="ion-at"></span><a class="text-primary" href="{% url "profiles:profile_detail" article.author %}">{{article.author}}</a>
     </div>
     <div class="col-7 text-center text-light">
-        <p>Posted at <i class="text-secondary">{{ article.created_at|date:"D d F Y f A" }}</i></p>
+        <p> <span class="ion-calendar"> </span> <i class="text-secondary">{{ article.created_at|date:"D d F Y f A" }}</i></p>
     </div>
+
+    {% ifnotequal  article.author request.user %}
+        {% if article not in request.user.starred_articles.all %}
+        <div class="col-7 text-center text-light">
+            <a href="{% url "articles:article_favorite" article.slug %}">
+                <button class="btn btn-sm btn-outline-danger action-btn">
+                    <i class="ion-heart" href="#"> Favorite Article</i> 
+                </button>
+            </a>
+        </div>
+        {% elif article in request.user.starred_articles.all %}
+        <div class="col-7 text-center text-light">
+            <a href="{% url "articles:article_favorite" article.slug %}">
+                <button class="btn btn-sm btn-outline-danger action-btn">
+                    <i class="ion-heart-broken" href="#"> Unfavorite Article</i> 
+                </button>
+            </a>
+        </div>
+        {% endif %}
+    {% else %}
+    <div class="col-7 text-center text-light">
+        <a href="{%url "articles:article_edit" article.slug %}">
+            <button class="btn btn-sm btn-outline-info action-btn">
+                <i class="ion-edit" href="#"> Edit</i> 
+            </button>
+        </a>
+        <a href="{%url "articles:article_delete" article.slug %}">
+            <button class="btn btn-sm btn-outline-danger action-btn">
+                <i class="ion-trash-a" > Delete</i>
+            </button>
+        </a>
+    </div>
+    {% endifnotequal %}
     <div class="col-7 text-light text-center mt-3 mb-4">
         {% if article.tags %}
-        Tags:
+        <span class="ion-pricetags"> </span>
         {% for tag in article.tags.all %}
         <a class="text-primary" href="{% url "articles:article_list_by_tag" tag.slug %}">
             {{ tag.name }}
@@ -50,18 +83,33 @@
             <div class=" text-center col-3 py-4 px-3 mb-5 mt-3 border">
                 <h2 class="article-title ">Comments</h2>
             </div>
-            <div class="col-12">
+            <div class="col-12 mb-3">
             {% include "components/form.html" with form_method="post" form=comment_form button_text="Add comment"%}
             </div>
                 {% for comment in comments %}
                 <div class="col-12 border rounded mx-auto px-4 py-2 mb-3">
-                    <p class="comment-text">
-                        {{ comment.body|linebreaks }}
-                    </p>
-                    <p class="info">
-                        <a href="#"><mark class="text-primary">{{ article.author}}</a> </mark> <span class="text-secondary">at
-                            {{ comment.created_at}}</span>
-                    </p>
+                <div class="row">
+                        <div class="col-10">
+                                <p class="comment-text">
+                                    {{ comment.body|linebreaks }}
+                                </p>
+                        </div>
+                        <div class="col-8">
+                            <p class="info">
+                                <a href="{% url "profiles:profile_detail" comment.author %}"><span class="ion-at text-dark"></span><mark class="text-primary">{{ comment.author}}</a> </mark> <span class="text-secondary">at
+                                    {{ comment.created_at}}</span>
+                            </p>
+                        </div>
+                        {% if request.user == comment.author or request.user == article.author %}
+                        <div class="col-4 text-right">
+                            <a href="{%url "articles:article_delete_comment" article.slug comment.id %}">
+                                <button class="btn btn-sm btn-outline-danger action-btn">
+                                    <i class="ion-trash-a" > Delete</i>
+                                </button>
+                            </a>
+                        </div>
+                        {% endif %}
+                </div>
                 </div>
                 {% empty %}
                 <div class="mt-3">
@@ -71,8 +119,9 @@
     </div>
 </div>
 {% endfor %}
+{% if comments %}
 {% include "components/pagination.html" with page=comments %}
-
+{% endif %}
 
 
 <div class="container">

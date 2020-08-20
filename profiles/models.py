@@ -2,13 +2,13 @@ from django.db import models
 
 # Create your models here.
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
 
-class Profile(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class Profile(AbstractUser):
+    username = models.CharField(max_length=50, unique=True)
     bio = models.CharField(max_length=100)
     display = models.ImageField(upload_to="images/profile-display/")
     followed_profiles = models.ManyToManyField(
@@ -19,4 +19,4 @@ class Profile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.user.username
+        return self.username

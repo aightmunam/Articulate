@@ -15,7 +15,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
-LOGIN_URL = '/login/'
+LOGIN_URL = '/profiles/login/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -30,6 +30,9 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+
+AUTH_USER_MODEL = 'profiles.Profile'
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -84,7 +87,7 @@ DATABASES = {
         'NAME': 'articulate',
         'USER': 'articulate',
         'PASSWORD': 'articulate',
-         'HOST': 'localhost'
+        'HOST': 'localhost'
     }
 }
 

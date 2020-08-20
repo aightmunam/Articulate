@@ -1,15 +1,31 @@
 <div class="container pagination d-flex justify-content-center">
     <div class="row">
-        <div class="col border rounded py-3 mb-3">
+        <div class="col py-3 mb-3">
             <span class="step-links">
                 {% if page.has_previous %}
-                <a href="?page={{ page.previous_page_number }}">Previous</a>
+               <a href="?page={{ page.previous_page_number }}">
+                    <button class="btn btn-sm btn-outline-warning ">
+                        <i class="ion-arrow-left-b" ></i> 
+                    </button>
+                </a>
+                {% else %}
+                    <button class="btn btn-sm btn-outline-secondary ">
+                        <i class="ion-arrow-left-b" ></i> 
+                    </button>
                 {% endif %}
-                <span class="current text-uppercase h6">
-                    Page <span class="text-primary">{{ page.number }} </span> of {{ page.paginator.num_pages }}.
+                <span class="current text-capitalize h6">
+                    <span class="text-primary">{{ page.number }} </span> of {{ page.paginator.num_pages }}
                 </span>
                 {% if page.has_next %}
-                <a href="?page={{ page.next_page_number }}">Next</a>
+                <a href="?page={{ page.next_page_number }}">
+                    <button class="btn btn-sm btn-outline-warning ">
+                        <i class="ion-arrow-right-b" ></i> 
+                    </button>
+                </a>
+                {% else %}
+                    <button class="btn btn-sm btn-outline-secondary ">
+                        <i class="ion-arrow-right-b" ></i> 
+                    </button>
                 {% endif %}
             </span>
         </div>
