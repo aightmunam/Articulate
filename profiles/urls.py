@@ -9,5 +9,6 @@ urlpatterns = [
     path('logout/', views.profile_logout, name='profile_logout'),
     path('@<str:username>/', views.profile_detail, name='profile_detail'),
     path('@<str:username>/follow/', views.profile_follow, name='profile_follow'),
-    path('@<str:username>/favorites/', views.profile_favorites, name='profile_favorites')
+    path('@<str:username>/edit/', views.profile_edit, name='profile_edit'),
+    path('@<str:username>/favorites/', views.profile_favorites, name='profile_favorites'),
 ]

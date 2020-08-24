@@ -1,6 +1,5 @@
 from django import forms
 from .models import Profile
-from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 
@@ -27,7 +26,6 @@ class SignupForm(forms.ModelForm):
                 raise ValidationError("Username already in use")
 
         return self.cleaned_data
-
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -58,18 +56,20 @@ class LoginForm(forms.Form):
 
 
 class UserChangeForm(forms.ModelForm):
-    """A form for updating users. Includes all the fields on
-    the user, but replaces the password field with admin's
-    password hash display field.
-    """
-    password = ReadOnlyPasswordHashField()
 
     class Meta:
         model = Profile
         fields = ('first_name', 'last_name', 'bio', 'display', 'password')
 
-    def clean_password(self):
-        # Regardless of what the user provides, return the initial value.
-        # This is done here, rather than on the field, because the
-        # field does not have access to the initial value
-        return self.initial["password"]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['first_name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'First Name'})
+        self.fields['last_name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Last Name'})
+        self.fields['bio'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Bio'})
+        self.fields['display'].widget.attrs.update({'placeholder': 'Display Image'})
+        self.fields['password'].widget.attrs.update({'class': 'form-control', 'placeholder': 'New Password'})
+
+        for field in self.fields:
+            self.fields[field].label = ""
+
+

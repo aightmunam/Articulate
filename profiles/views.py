@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
 
-from .forms import LoginForm, SignupForm
+from .forms import LoginForm, SignupForm, UserChangeForm
 from .models import Profile
 
 # Create your views here.
@@ -71,3 +71,31 @@ def profile_follow(request, username):
     else:
         current_user.followed_profiles.add(Profile.objects.get(username=username))
     return redirect("profiles:profile_detail", username=username)
+
+
+def profile_edit(request, username):
+    if not request.user.is_authenticated:
+        return redirect(settings.LOGIN_URL)
+
+    current_user = request.user
+
+    form = UserChangeForm(data=request.POST or None, files=request.FILES or None, instance=current_user)
+    if request.method == 'POST':
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            current_user.first_name = cleaned_data["first_name"]
+            current_user.last_name = cleaned_data["last_name"]
+            current_user.bio = cleaned_data["bio"]
+            current_user.display.file = cleaned_data["display"]
+            current_user.set_password(cleaned_data["password"])
+            current_user.save()
+            authenticate(request, username=current_user.username, password=current_user.password)
+            login(request, current_user)
+            redirect("profiles:profile_detail", username=username)
+
+    else:
+        form = UserChangeForm(initial={'first_name': current_user.first_name,
+                                       'last_name': current_user.last_name,
+                                       'bio': current_user.bio,
+                                       'display': current_user.display})
+    return render(request, "profiles/edit_profile.html", context={"profile_form": form})

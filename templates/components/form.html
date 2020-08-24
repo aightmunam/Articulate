@@ -5,7 +5,7 @@
 {% endif %}
 <div class="row justify-content-center">
 <div class="col-md-6 col-xs-8 ">
-<form method="{{form_method}}">
+<form method="{{form_method}}" enctype="multipart/form-data">
     {% ifequal form_method "post" %}
     {% csrf_token %}
     {% endifequal %}

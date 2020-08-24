@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 # Create your models here.
 
@@ -10,7 +11,7 @@ from django.contrib.auth.models import AbstractUser
 class Profile(AbstractUser):
     username = models.CharField(max_length=50, unique=True)
     bio = models.CharField(max_length=100)
-    display = models.ImageField(upload_to="images/profile-display/")
+    display = models.ImageField(upload_to="profile-display/")
     followed_profiles = models.ManyToManyField(
         "self", related_name="followed", blank=True)
     starred_articles = models.ManyToManyField(

@@ -54,7 +54,6 @@ def article_detail(request, article_slug):
     similar_articles = Article.objects.filter(tags__in=article_tags).exclude(id=article.id)
     similar_articles = similar_articles.annotate(same_tags=Count('tags')).order_by('-same_tags', '-created_at')
 
-    print(type(request.user))
     new_comment = None
     if request.method == 'POST':
         if request.user.is_authenticated:
@@ -120,13 +119,14 @@ def article_edit(request, article_slug):
 
     current_article =  get_object_or_404(Article, slug=article_slug)
     if request.method == 'POST':
-        form = ArticleForm(data=request.POST)
+        form = ArticleForm(data=request.POST, files=request.FILES or None, instance=current_article)
         if form.is_valid():
             cleaned_data = form.cleaned_data
             current_article.title = cleaned_data['title']
             current_article.description = cleaned_data['description']
             current_article.content = cleaned_data['content']
-            current_article.cover_image = cleaned_data['cover_image']
+            print(cleaned_data["cover_image"])
+            current_article.cover_image.file = cleaned_data['cover_image']
             current_article.tags.clear()
             tags = cleaned_data["tags"]
             tag_list = tags.split(',')
@@ -139,10 +139,12 @@ def article_edit(request, article_slug):
 
             return redirect('articles:article_detail', article_slug=current_article.slug)
     else:
+        tags = ", ".join([tag.name for tag in current_article.tags.all() if tag])
         form = ArticleForm(initial={'title': current_article.title,
                                     'description': current_article.description,
                                     'content': current_article.content,
-                                    'cover_image': current_article.cover_image})
+                                    'cover_image': current_article.cover_image,
+                                    'tags': tags})
 
     return render(request, "articles/edit_article.html", context={"article_form": form})
 

@@ -6,7 +6,7 @@
                     <div class="col-md-6 col-lg-6 col-xl-8 d-flex">
                         <a href='{% url "articles:article_detail" article.slug %}'
                             class="img w-100 mb-3 mb-md-0"
-                            style="background-image: {% if article.cover_image %}url(https://colorlib.com/preview/theme/readit/images/image_1.jpg){% else %} url(https://colorlib.com/preview/theme/readit/images/image_2.jpg){% endif %};"></a>
+                            style="object-fit: cover;  background-size: cover;background-repeat: no-repeat; background-image: {% if article.cover_image %}url({{article.cover_image.url}}){% else %} url(https://colorlib.com/preview/theme/readit/images/image_2.jpg){% endif %};"></a>
                     </div>
                     <div class="col-md-6 col-lg-6 col-xl-4 d-flex">
                         <div class="row d-flex text w-100 pl-md-3 ">

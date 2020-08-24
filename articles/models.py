@@ -13,7 +13,7 @@ class Article(models.Model):
     content = models.TextField()
     # blank = True means not required in Django
     # null = True means not required in the database
-    cover_image = models.ImageField(upload_to="images/article-cover/", blank=True, null=True)
+    cover_image = models.ImageField(upload_to="article-cover/", blank=True, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
                                on_delete=models.CASCADE,
                                related_name='articles')

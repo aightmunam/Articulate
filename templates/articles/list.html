@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block headtitle %}Articles{% endblock %}
 {% block content %}
+{% load static %}
 {% if not request.user.is_authenticated %}
 <div class="row d-flex justify-content-center pt-5 bg-dark">
     <div class="col-8  pb-5 text-center">

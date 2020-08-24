@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 {% load profile_tags %}
+{% load static %}
 {% block headtitle %}@{{ profile.username }}{% endblock %}
 {% block content %}
 <div class="row d-flex justify-content-center border-bottom pt-3 mb-3 bg-dark">
     <div class="col-12 text-center mb-2">
-        <img src="http://i.imgur.com/Qr71crq.jpg" style="vertical-align:middle;width: 100px;height: 100px;border-radius: 50%;" class="avatar" />
+        <img src="{% static profile.display.url %}" style="object-fit: cover;vertical-align:middle;width: 100px;height: 100px;border-radius: 50%;" class="avatar" />
     </div>
     <div class="col-7 text-center text-light m-2">
         <span class="ion-at text-secondary"></span><a class="text-primary" href="{%url "profiles:profile_detail" profile.username %}">{{profile.username}}</a>
@@ -16,7 +17,7 @@
     {% endif %}
     {% ifnotequal  profile request.user %}
     {% if profile not in request.user.followed_profiles.all %}
-        <div class="col-7 text-center text-light mb-3">
+        <div class="col-7 text-center text-light mb-4">
             <a href="{% url "profiles:profile_follow" profile.username %}">
                 <button class="btn btn-sm btn-outline-success action-btn">
                     <i class="ion-plus"> Follow</i>
@@ -24,7 +25,7 @@
             </a>
         </div>
         {% else %}
-        <div class="col-7 text-center text-light">
+        <div class="col-7 text-center text-light mb-4">
             <a href="{% url "profiles:profile_follow" profile.username %}">
                 <button class="btn btn-sm btn-outline-danger action-btn">
                     <i class="ion-minus"> Unfollow</i>
@@ -34,7 +35,7 @@
         {% endif %}
     {% else %}
     <div class="col-7 text-center text-light mb-4">
-        <a href="">
+        <a href="{% url "profiles:profile_edit" profile.username %}">
             <button class="btn btn-sm btn-outline-secondary action-btn">
                 <i class="ion-android-settings"> Edit Profile</i>
             </button>

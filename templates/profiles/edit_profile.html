@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block headtitle %}Edit Profile{% endblock %}
+{% block content %}
+{% include "components/form.html" with form_method="post" form=profile_form heading_text="Edit Profile" button_text="Update Profile" %}
+{% endblock %}
