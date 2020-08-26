@@ -10,7 +10,11 @@
         </div>
     </div>
     <div class="col-12 text-center mb-2">
+        {% if article.author.display %}
         <img src="{% static article.author.display.url %}" style="object-fit: cover; vertical-align:middle;width: 80px;height: 80px;border-radius: 50%;" class="avatar" />
+        {% else %}
+        <img src="{% static 'images/roman_empire.jpg' %}" style="object-fit: cover; vertical-align:middle;width: 80px;height: 80px;border-radius: 50%;" class="avatar" />
+        {% endif %}
     </div>
     <div class="col-7 text-center text-secondary">
         <span class="ion-at"></span><a class="text-primary" href="{% url "profiles:profile_detail" article.author %}">{{article.author}}</a>
@@ -24,7 +28,7 @@
         <div class="col-7 text-center text-light">
             <a href="{% url "articles:article_favorite" article.slug %}">
                 <button class="btn btn-sm btn-outline-danger action-btn">
-                    <i class="ion-heart" href="#"> Favorite Article</i> 
+                    <i class="ion-heart" href="#"> Favorite Article</i>
                 </button>
             </a>
         </div>
@@ -32,7 +36,7 @@
         <div class="col-7 text-center text-light">
             <a href="{% url "articles:article_favorite" article.slug %}">
                 <button class="btn btn-sm btn-outline-danger action-btn">
-                    <i class="ion-heart-broken" href="#"> Unfavorite Article</i> 
+                    <i class="ion-heart-broken" href="#"> Unfavorite Article</i>
                 </button>
             </a>
         </div>
@@ -41,7 +45,7 @@
     <div class="col-7 text-center text-light">
         <a href="{%url "articles:article_edit" article.slug %}">
             <button class="btn btn-sm btn-outline-info action-btn">
-                <i class="ion-edit" href="#"> Edit</i> 
+                <i class="ion-edit" href="#"> Edit</i>
             </button>
         </a>
         <a href="{%url "articles:article_delete" article.slug %}">
@@ -66,8 +70,13 @@
 
 <div class="row d-d-flex justify-content-center">
     <div class="col-5 mb-5 mt-4">
+        {% if article.cover_image %}
         <img class="img-fluid w-100 rounded mx-auto d-block"
             src="{% static article.cover_image.url %}" alt="">
+        {% else %}
+        <img class="img-fluid w-100 rounded mx-auto d-block"
+        src="{% static 'images/roman_empire.jpg' %}" alt="">
+        {% endif %}
     </div>
 </div>
 

@@ -21,28 +21,80 @@
     </div>
 </div>
 
-<div class="container">
-
-    {% if tag %}
-    <div class="row d-flex justify-content-center">
-        <p>All the articles tagged by <span class="text-primary">{{tag}}</span> tag</p>
+<div class="row">
+{% if local %}
+    <div class="col-6 text-right text-light mb-3 p-1">
+        <a href="{% url "articles:article_list"  %}">
+            <button class="btn btn-sm  action-btn btn-outline-secondary " >
+                <i class="ion-eye"> Global Feed </i>
+            </button>
+        </a>
     </div>
-    {% endif %}
-
-    {% if query %}
-    <div class="row d-flex justify-content-center">
-        <p>Showing results for <span class="text-primary">{{query}}</span></p>
+    <div class="col-6 text-left text-light mb-3 p-1">
+        <a href="{% url "articles:article_local_feed" %}">
+            <button class="btn btn-sm action-btn btn-dark" >
+                <i class="ion-ios-arrow-down"> Your Feed </i>
+            </button>
+        </a>
     </div>
-    {% endif %}
+{% else %}
+    <div class="col-6 text-right text-light mb-3 p-1">
+        <a href="{% url "articles:article_list"  %}">
+            <button class="btn btn-sm  action-btn btn-dark" >
+                <i class="ion-ios-arrow-down"> Global Feed </i>
+            </button>
+        </a>
+    </div>
+    <div class="col-6 text-left text-light mb-3 p-1">
+        <a href="{% url "articles:article_local_feed" %}">
+            <button class="btn btn-sm action-btn btn-outline-secondary" >
+                <i class="ion-eye"> Your Feed </i>
+            </button>
+        </a>
+    </div>
+{% endif %}
+</div>
 
-    <div class="row d-flex justify-content-center border-top">
-        {% for article in articles %}
-			{% include "components/card.html" with article=article %}
-        {% empty %}
-        <div class="col-8 text-center m-5 h3">
-            <p>There are no articles yet.</p>
+<div class="container-fluid">
+    <div class="row d-flex justify-content-center">
+        {% if tag %}
+        <div class="col-12 text-center">
+            <p>All the articles tagged by <span class="text-primary">{{tag}}</span> tag</p>
         </div>
-        {% endfor %}
+        {% endif %}
+        {% if query %}
+        <div class="col-12 text-center">
+            <p>Showing results for <span class="text-primary">{{query}}</span></p>
+        </div>
+        {% endif %}
+        <div class="col-10 d-flex justify-content-center">
+            <div class="col-12">
+                {% for article in articles %}
+                    {% include "components/card.html" with article=article %}
+                {% empty %}
+                <div class="col-10 text-center justify-content m-5 py-5 display-3">
+                    <p>There are no articles yet.</p>
+                </div>
+                {% endfor %}
+                
+            </div>
+        </div>
+        <div class="col-2 text-center px-4">
+            {% if popular_tags %}
+            <div class="h3 mb-3 rounded text-center py-3 px-3 border">
+            Trending tags
+            </div>
+            {% for tag in popular_tags %}
+            <div class="mt-2">
+                <a href="{% url "articles:article_list_by_tag" tag.slug %}">
+                    <button class="block btn btn-sm  action-btn btn-outline-secondary" >
+                        <i class="ion-ios-arrow-up"> {{tag.name}} </i>
+                    </button>
+                </a>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
     </div>
 </div>
 {% if articles %}

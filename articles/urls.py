@@ -5,6 +5,8 @@ from . import views
 app_name = 'articles'
 urlpatterns = [
     path('', views.article_list, name='article_list'),
+    path('local-feed/', views.article_list, {'local': True}, name='article_local_feed'),
+    path('local-feed/tag/<slug:tag_slug>/', views.article_list, {'local': True}, name='article_local_feed_by_tag'),
     path('tag/<slug:tag_slug>/', views.article_list, name='article_list_by_tag'),
     path('search/<slug:query>/', views.article_list, name='article_list_by_search'),
     path('new/', views.article_create_new, name='article_create_new'),

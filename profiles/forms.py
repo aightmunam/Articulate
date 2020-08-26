@@ -42,7 +42,6 @@ class LoginForm(forms.Form):
     def clean(self):
         password = self.cleaned_data.get("password")
         username = self.cleaned_data.get("username")
-
         if username is not None and password:
             user = authenticate(username=username, password=password)
             if user is None:
