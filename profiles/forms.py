@@ -1,9 +1,10 @@
 from django import forms
 from .models import Profile
 from django.contrib.auth import authenticate
+from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
-class SignupForm(forms.ModelForm):
+class SignupForm(UserCreationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control", "placeholder":"Username"}), label="", )
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder":"Password"}), label="")
     password2 = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder":"Confirm password"}), label="")

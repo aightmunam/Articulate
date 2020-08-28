@@ -19,24 +19,29 @@
     <div class="col-7 text-center text-secondary">
         <span class="ion-at"></span><a class="text-primary" href="{% url "profiles:profile_detail" article.author %}">{{article.author}}</a>
     </div>
-    <div class="col-7 text-center text-light">
+    <div class="col-7 text-center text-secondary">
         <p> <span class="ion-calendar"> </span> <i class="text-secondary">{{ article.created_at|date:"D d F Y f A" }}</i></p>
     </div>
 
     {% ifnotequal  article.author request.user %}
-        {% if article not in request.user.starred_articles.all %}
-        <div class="col-7 text-center text-light">
+        {% if article not in request.user.get_favorite_articles %}
+        <div class="col-7 text-center text-secondary">
             <a href="{% url "articles:article_favorite" article.slug %}">
                 <button class="btn btn-sm btn-outline-danger action-btn">
-                    <i class="ion-heart" href="#"> Favorite Article</i>
+                    <i class="ion-heart" href="#"> Favorite Article
+                        <span class="text-light badge badge-pill badge-danger px-1 font-weight-bolder rounded"> {{ article.get_favorited_count }}</span>
+                    </i>
                 </button>
             </a>
         </div>
-        {% elif article in request.user.starred_articles.all %}
+        {% elif article in request.user.get_favorite_articles %}
         <div class="col-7 text-center text-light">
-            <a href="{% url "articles:article_favorite" article.slug %}">
+            <a href="{% url "articles:article_unfavorite" article.slug %}">
                 <button class="btn btn-sm btn-outline-danger action-btn">
-                    <i class="ion-heart-broken" href="#"> Unfavorite Article</i>
+                    <i class="ion-heart-broken" href="#"> Unfavorite Article
+                        <span class="text-danger badge badge-pill badge-dark font-weight-bolder rounded"> {{ article.get_favorited_count }}</span>
+
+                    </i>
                 </button>
             </a>
         </div>
@@ -50,14 +55,14 @@
         </a>
         <a href="{%url "articles:article_delete" article.slug %}">
             <button class="btn btn-sm btn-outline-danger action-btn">
-                <i class="ion-trash-a" > Delete</i>
+                <i class="ion-ios-trash" > Delete</i>
             </button>
         </a>
     </div>
     {% endifnotequal %}
     <div class="col-7 text-light text-center mt-3 mb-4">
         {% if article.tags %}
-        <span class="ion-pricetags"> </span>
+        <span class="ion-pound text-secondary"> </span>
         {% for tag in article.tags.all %}
         <a class="text-primary" href="{% url "articles:article_list_by_tag" tag.slug %}">
             {{ tag.name }}
@@ -99,10 +104,11 @@
                 {% for comment in comments %}
                 <div class="col-12 border rounded mx-auto px-4 py-2 mb-3">
                 <div class="row">
-                        <div class="col-10">
+                        <div class="col-12">
                                 <p class="comment-text">
                                     {{ comment.body|linebreaks }}
                                 </p>
+                                <hr class="mb-3">
                         </div>
                         <div class="col-8">
                             <p class="info">
@@ -127,21 +133,24 @@
                 </div>
         </div>
     </div>
+    <hr class="mb-3">
 </div>
 {% endfor %}
+
 {% if comments %}
 {% include "components/pagination.html" with page=comments %}
-{% endif %}
 
+<hr class="mb-3">
+{% endif %}
 
 <div class="container">
     <div class="row d-flex justify-content-center">
-        {% if similar_articles %}
+        {% if article.get_similar_articles %}
         <div class="py-4 px-3 mb-5 mt-5 border">
             <h2 class="text-center">Recommended articles</h2>
         </div>
         {% endif %}
-        {% for article in similar_articles %}
+        {% for article in article.get_similar_articles %}
         {% include "components/card.html" with article=article %}
         {% empty %}
         {% endfor %}

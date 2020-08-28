@@ -28,7 +28,7 @@
                                 </div>
                                 <div class="mb-4">
                                     {% if article.tags %}
-                                    <span class="ion-pricetags">  </span>
+                                    <span class="ion-pound text-secondary">  </span>
                                     {% for tag in article.tags.all %}
                                     <a class="text-primary" href="{% url "articles:article_list_by_tag" tag.slug %}">
                                         {{ tag.name }}

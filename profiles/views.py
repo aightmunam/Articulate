@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+
 from django.conf import settings
 
 from .forms import LoginForm, SignupForm, UserChangeForm
@@ -38,6 +40,7 @@ def profile_register(request):
     return render(request, 'profiles/register.html', context={"register_form": form})
 
 
+@login_required
 def profile_logout(request):
     if not request.user.is_authenticated:
         redirect("profiles:profile_login")
@@ -47,7 +50,7 @@ def profile_logout(request):
 
 def profile_detail(request, username):
     profile = get_object_or_404(Profile, username=username)
-    articles = profile.articles.all()
+    articles = profile.get_authored_articles()
     return render(request, 'profiles/detail.html', context={"profile": profile,
                                                             "articles": articles,
                                                             "favorite": False})
@@ -55,28 +58,22 @@ def profile_detail(request, username):
 
 def profile_favorites(request, username):
     profile = get_object_or_404(Profile, username=username)
-    articles = profile.starred_articles.all()
+    articles = profile.get_favorite_articles()
     return render(request, 'profiles/detail.html', context={"profile": profile,
                                                             "articles": articles,
                                                             "favorite": True})
 
-
-def profile_follow(request, username):
-    if not request.user.is_authenticated:
-        return redirect(settings.LOGIN_URL)
-
+@login_required
+def profile_follow(request, username, follow=True):
     current_user = request.user
-    if current_user.followed_profiles.filter(username=username).exists():
-        current_user.followed_profiles.remove(current_user.followed_profiles.get(username=username))
+    if follow:
+        current_user.follow_profile(username=username)
     else:
-        current_user.followed_profiles.add(Profile.objects.get(username=username))
+        current_user.unfollow_profile(username=username)
     return redirect("profiles:profile_detail", username=username)
 
-
+@login_required
 def profile_edit(request, username):
-    if not request.user.is_authenticated:
-        return redirect(settings.LOGIN_URL)
-
     current_user = request.user
 
     form = UserChangeForm(data=request.POST or None, files=request.FILES or None, instance=current_user)

@@ -13,6 +13,7 @@ urlpatterns = [
     path('<slug:article_slug>/', views.article_detail, name='article_detail'),
     path('<slug:article_slug>/edit/', views.article_edit, name='article_edit'),
     path('<slug:article_slug>/delete/', views.article_delete, name='article_delete'),
-    path('<slug:article_slug>/favorite/', views.article_favorite, name='article_favorite'),
+    path('<slug:article_slug>/favorite/', views.article_favorite, {"favorite": True}, name='article_favorite'),
+    path('<slug:article_slug>/unfavorite/', views.article_favorite, {"favorite": False}, name='article_unfavorite'),
     path('<slug:article_slug>/comments/<int:comment_id>/delete', views.article_delete_comment, name='article_delete_comment')
 ]

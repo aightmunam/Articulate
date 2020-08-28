@@ -5,10 +5,12 @@ from django.db.models.query import QuerySet
 from django.core.paginator import Paginator, EmptyPage,\
     PageNotAnInteger
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import TrigramSimilarity
 
 import collections
 
+from profiles.models import Profile
 from .models import Article, Tag, Comment
 from .forms import ArticleForm, CommentForm, SearchForm
 
@@ -20,18 +22,24 @@ def article_list(request, tag_slug=None, local=False):
     feed_articles = None
     if local:
         if request.user.is_authenticated:
-            current_user_following = request.user.followed_profiles.all()
-            following_users_authored_articles = [followed.articles.all() for followed in current_user_following if followed]
+            current_user_following = request.user.get_followed_profiles()
+            local_feed_articles = []
 
+            following_users_authored_articles = [followed_user.get_authored_articles() for followed_user in current_user_following if followed_user]
             if following_users_authored_articles:
-                following_users_authored_articles = following_users_authored_articles[0]
+                local_feed_articles = following_users_authored_articles[0]
+                for followed_user_article_qs in following_users_authored_articles:
+                    local_feed_articles = (local_feed_articles | followed_user_article_qs)
 
-            following_users_starred_articles = [followed.starred_articles.all() for followed in current_user_following]
+
+            following_users_starred_articles = [followed_user.get_favorite_articles() for followed_user in current_user_following if followed_user]
             if following_users_starred_articles:
-                following_users_starred_articles = following_users_starred_articles[0]
+                for followed_users_article in following_users_starred_articles:
+                    local_feed_articles = (local_feed_articles | followed_users_article)
 
-            if following_users_starred_articles and following_users_authored_articles:
-                local_feed_articles = (following_users_authored_articles | following_users_starred_articles).distinct().order_by('-created_at').exclude(author=request.user)
+            if local_feed_articles:
+                feed_articles = local_feed_articles.distinct().order_by('-created_at').exclude(author=request.user)
+            else:
                 feed_articles = local_feed_articles
         else:
             return redirect(settings.LOGIN_URL)
@@ -40,15 +48,18 @@ def article_list(request, tag_slug=None, local=False):
         feed_articles = global_feed_articles
 
     tags_in_feed_articles = None
-    for article in feed_articles:
-        if article:
-            if tags_in_feed_articles:
-                tags_in_feed_articles = tags_in_feed_articles | article.tags.all()
-            else:
-                tags_in_feed_articles = article.tags.all()
+    if feed_articles:
+        for article in feed_articles:
+            if article:
+                if tags_in_feed_articles:
+                    tags_in_feed_articles = tags_in_feed_articles | article.tags.all()
+                else:
+                    tags_in_feed_articles = article.tags.all()
+        popular_tags = collections.Counter(tags_in_feed_articles)
+        top_five_most_popular_tags = [popular_tag for popular_tag, tag_pop in popular_tags.most_common(5)]
+    else:
+        top_five_most_popular_tags = []
 
-    popular_tags = collections.Counter(tags_in_feed_articles)
-    top_five_most_popular_tags = [popular_tag for popular_tag, tag_pop in popular_tags.most_common(5)]
 
     search_form = SearchForm()
     tag = None
@@ -86,11 +97,6 @@ def article_list(request, tag_slug=None, local=False):
 
 def article_detail(request, article_slug):
     article = get_object_or_404(Article, slug=article_slug)
-
-    article_tags = article.tags.values_list('id', flat=True)
-    similar_articles = Article.objects.filter(tags__in=article_tags).exclude(id=article.id)
-    similar_articles = similar_articles.annotate(same_tags=Count('tags')).order_by('-same_tags', '-created_at')
-
     new_comment = None
     if request.method == 'POST':
         if request.user.is_authenticated:
@@ -105,7 +111,8 @@ def article_detail(request, article_slug):
     else:
         comment_form = CommentForm()
 
-    comments = article.comments.all().order_by('-created_at')
+    comments = article.get_all_comments()
+
     paginator = Paginator(comments, 5)
     page = request.GET.get('page')
     try:
@@ -119,13 +126,10 @@ def article_detail(request, article_slug):
                                                             "page": page,
                                                             "comments": comments,
                                                             "new_comment": new_comment,
-                                                            "comment_form": comment_form,
-                                                            "similar_articles": similar_articles})
+                                                            "comment_form": comment_form,})
 
+@login_required
 def article_create_new(request):
-    if not request.user.is_authenticated:
-        return redirect(settings.LOGIN_URL)
-
     if request.method == 'POST':
         form = ArticleForm(data=request.POST, files=request.FILES)
         if form.is_valid():
@@ -150,10 +154,8 @@ def article_create_new(request):
     return render(request, "articles/create_new.html", context={"article_form": form})
 
 
+@login_required
 def article_edit(request, article_slug):
-    if not request.user.is_authenticated:
-        return redirect(settings.LOGIN_URL)
-
     current_article =  get_object_or_404(Article, slug=article_slug)
     if request.method == 'POST':
         form = ArticleForm(data=request.POST, files=request.FILES or None, instance=current_article)
@@ -184,30 +186,25 @@ def article_edit(request, article_slug):
 
     return render(request, "articles/edit_article.html", context={"article_form": form})
 
-def article_delete(request, article_slug):
-    if not request.user.is_authenticated:
-        return redirect(settings.LOGIN_URL)
 
+@login_required
+def article_delete(request, article_slug):
     get_object_or_404(Article, slug=article_slug).delete()
     return redirect("articles:article_list")
 
 
+@login_required
 def article_delete_comment(request, article_slug, comment_id):
-    if not request.user.is_authenticated:
-        return redirect(settings.LOGIN_URL)
-
     get_object_or_404(Comment, id=comment_id).delete()
     return redirect("articles:article_detail", article_slug=article_slug)
 
 
-def article_favorite(request, article_slug):
-    if not request.user.is_authenticated:
-        return redirect(settings.LOGIN_URL)
-
+@login_required
+def article_favorite(request, article_slug, favorite=True):
     current_user = request.user
-    if current_user.starred_articles.filter(slug=article_slug).exists():
-        current_user.starred_articles.remove(current_user.starred_articles.get(slug=article_slug))
+    if favorite:
+        current_user.favorite_article(article_slug=article_slug)
     else:
-        current_user.starred_articles.add(get_object_or_404(Article, slug=article_slug))
+        current_user.unfavorite_article(article_slug=article_slug)
     return redirect('articles:article_detail', article_slug=article_slug)
 

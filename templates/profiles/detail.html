@@ -11,28 +11,31 @@
         <img src="{% static 'images/roman_empire.jpg' %}" style="object-fit: cover;vertical-align:middle;width: 100px;height: 100px;border-radius: 50%;" class="avatar" />
         {% endif %}
     </div>
-    <div class="col-7 text-center text-light m-2">
-        <span class="ion-at text-secondary"></span><a class="text-primary" href="{%url "profiles:profile_detail" profile.username %}">{{profile.username}}</a>
+    <div class="col-7 text-center text-secondary m-2">
+        <span class="text-secondary ion-at "></span><a class="text-primary" href="{%url "profiles:profile_detail" profile.username %}">{{profile.username}}</a>
     </div>
     {% if profile.bio %}
-    <div class="col-7 text-center text-light">
-        <p> <span class="ion-document"> </span> <i class="text-light">{{ profile.bio }}</i></p>
+    <div class="col-7 text-center text-secondary">
+        <p> <span class="text-secondary ion-card "> </span> <i class="text-light">{{ profile.bio }}</i></p>
     </div>
     {% endif %}
+
     {% ifnotequal  profile request.user %}
     {% if profile not in request.user.followed_profiles.all %}
         <div class="col-7 text-center text-light mb-4">
             <a href="{% url "profiles:profile_follow" profile.username %}">
                 <button class="btn btn-sm btn-outline-success action-btn">
-                    <i class="ion-plus"> Follow</i>
+                    <i class="ion-plus"> Follow  
+                        <span class="text-lightbadge badge badge-pill badge-success px-1 font-weight-bold rounded"> {{ profile.get_follower_count }}</span></i>
                 </button>
             </a>
         </div>
         {% else %}
         <div class="col-7 text-center text-light mb-4">
-            <a href="{% url "profiles:profile_follow" profile.username %}">
+            <a href="{% url "profiles:profile_unfollow" profile.username %}">
                 <button class="btn btn-sm btn-outline-danger action-btn">
-                    <i class="ion-minus"> Unfollow</i>
+                    <i class="ion-minus"> Unfollow 
+                        <span class="text-light badge badge-pill badge-danger px-1 font-weight-bolder rounded"> {{ profile.get_follower_count }}</span></i></i>
                 </button>
             </a>
         </div>
@@ -41,7 +44,7 @@
     <div class="col-7 text-center text-light mb-4">
         <a href="{% url "profiles:profile_edit" profile.username %}">
             <button class="btn btn-sm btn-outline-secondary action-btn">
-                <i class="ion-android-settings"> Edit Profile</i>
+                <i class="ion-ios-cog"> Edit Profile</i>
             </button>
         </a>
     </div>
