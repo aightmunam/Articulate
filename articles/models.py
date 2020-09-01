@@ -1,13 +1,14 @@
+import os
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Count
 from django_extensions.db.fields import AutoSlugField
 from django.conf import settings
 
+from .signals import tag_click
 
-import os
 
-# Create your models here.
 class Article(models.Model):
     title = models.CharField(max_length=100)
     slug = AutoSlugField(('slug'), max_length=50, unique=True, populate_from=('title',))
@@ -45,11 +46,23 @@ class Article(models.Model):
 class Tag(models.Model):
     name = models.CharField(max_length=25, unique=True)
     slug = AutoSlugField(('slug'), max_length=25, populate_from=('name',))
+    click_count = models.IntegerField(default=0)
+    clicked_by_profile = models.ManyToManyField(settings.AUTH_USER_MODEL,
+                                                related_name='tags_clicked',
+                                                blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
+
+    def increase_click_count(self):
+        self.click_count += 1
+        self.save()
+
+    def add_profile_to_clicked(self, Profile):
+        self.clicked_by_profile.add(Profile)
+        self.save()
 
 
 class Comment(models.Model):
@@ -66,12 +79,8 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
     class Meta:
         ordering = ('created_at',)
 
     def __str__(self):
         return "Comment by {} on {}".format(self.author, self.article)
-
-    def favorite_article(self, username):
-        pass

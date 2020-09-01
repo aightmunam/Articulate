@@ -1,22 +1,24 @@
+import collections
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404, JsonResponse
 from django.db.models import Count
 from django.db.models.query import QuerySet
-from django.core.paginator import Paginator, EmptyPage,\
-    PageNotAnInteger
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import TrigramSimilarity
-
-import collections
+from django.dispatch import receiver
 
 from profiles.models import Profile
 from .models import Article, Tag, Comment
+from .signals import tag_click
 from .forms import ArticleForm, CommentForm, SearchForm
 
-# Create your views here.
+
 def aritcle_index(request):
     return redirect("articles:article_list")
+
 
 def article_list(request, tag_slug=None, local=False):
     feed_articles = None
@@ -60,7 +62,6 @@ def article_list(request, tag_slug=None, local=False):
     else:
         top_five_most_popular_tags = []
 
-
     search_form = SearchForm()
     tag = None
     query = None
@@ -76,6 +77,7 @@ def article_list(request, tag_slug=None, local=False):
 
         if tag_slug:
             tag = get_object_or_404(Tag, slug=tag_slug)
+            tag_click.send(sender=Tag, tag=tag, profile=request.user)
             feed_articles = feed_articles.filter(tags__in=[tag])
 
         paginator = Paginator(feed_articles, 4)
@@ -94,6 +96,7 @@ def article_list(request, tag_slug=None, local=False):
                                                           "query": query,
                                                           "local": local,
                                                           "popular_tags": top_five_most_popular_tags})
+
 
 def article_detail(request, article_slug):
     article = get_object_or_404(Article, slug=article_slug)
@@ -127,6 +130,7 @@ def article_detail(request, article_slug):
                                                             "comments": comments,
                                                             "new_comment": new_comment,
                                                             "comment_form": comment_form,})
+
 
 @login_required
 def article_create_new(request):
@@ -207,4 +211,3 @@ def article_favorite(request, article_slug, favorite=True):
     else:
         current_user.unfavorite_article(article_slug=article_slug)
     return redirect('articles:article_detail', article_slug=article_slug)
-
