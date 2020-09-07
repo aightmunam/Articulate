@@ -24,7 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', aritcle_index, name='index'),
     path('profiles/', include('profiles.urls', namespace='profiles')),
-    path('articles/', include('articles.urls', namespace='articles'))
+    path('articles/', include('articles.urls', namespace='articles')),
+    path('api/articles/', include('articles.api.urls', namespace='api_articles'))
 ]
 
 if settings.DEBUG:

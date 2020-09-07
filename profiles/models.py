@@ -1,12 +1,11 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from articles.models import Article
 from django.db.models import Count
-# Create your models here.
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+
 
 
 class Profile(AbstractUser):
@@ -58,4 +57,3 @@ class Profile(AbstractUser):
 
     def get_following_count(self):
         return len(self.get_followed_profiles())
-

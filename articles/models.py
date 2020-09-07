@@ -3,10 +3,10 @@ import os
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Count
+from django.db.models.signals import post_delete
 from django_extensions.db.fields import AutoSlugField
 from django.conf import settings
-
-from .signals import tag_click
+from django.dispatch import receiver
 
 
 class Article(models.Model):
@@ -23,6 +23,10 @@ class Article(models.Model):
     tags = models.ManyToManyField('articles.Tag', related_name='articles', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+    class Meta:
+        ordering = ['created_at']
 
     def __str__(self):
         return self.title

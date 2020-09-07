@@ -144,7 +144,7 @@ def article_create_new(request):
             obj.save()
             for tag in tag_list:
                 tag = tag.lower()
-                tag_qs = Tag.objects.all().filter(name__icontains=tag)
+                tag_qs = Tag.objects.all().filter(name=tag)
                 if tag_qs:
                     for tag_obj in tag_qs:
                         obj.tags.add(tag_obj)
