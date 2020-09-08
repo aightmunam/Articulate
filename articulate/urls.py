@@ -17,6 +17,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from articles.api.views import api_root
 from articles.views import aritcle_index
 from profiles.views import profile_login
 
@@ -25,7 +26,9 @@ urlpatterns = [
     path('', aritcle_index, name='index'),
     path('profiles/', include('profiles.urls', namespace='profiles')),
     path('articles/', include('articles.urls', namespace='articles')),
-    path('api/articles/', include('articles.api.urls', namespace='api_articles'))
+    path('api/', api_root, name='api-root'),
+    path('api/articles/', include('articles.api.urls', namespace='api_articles')),
+    path('api/profiles/', include('profiles.api.urls', namespace='api_profiles'))
 ]
 
 if settings.DEBUG:

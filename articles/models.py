@@ -44,7 +44,7 @@ class Article(models.Model):
         return self.favorited.all()
 
     def get_favorited_count(self):
-        return len(self.get_authors_favorited())
+        return self.get_authors_favorited().count()
 
 
 class Tag(models.Model):
