@@ -43,17 +43,22 @@ class Profile(AbstractUser):
         if self.followed_profiles.filter(username=username).exists():
             self.followed_profiles.remove(self.followed_profiles.get(username=username))
 
+    def is_favorite(self, article_slug):
+        if self.favorite_articles.filter(slug=article_slug).exists():
+            return True
+        return False
+
     def favorite_article(self, article_slug):
         article_to_favorite = Article.objects.get(slug=article_slug)
-        if article_to_favorite:
+        if article_to_favorite and not self.is_favorite(article_slug):
             self.favorite_articles.add(article_to_favorite)
 
     def unfavorite_article(self, article_slug):
-        if self.favorite_articles.filter(slug=article_slug).exists():
+        if self.is_favorite(article_slug):
             self.favorite_articles.remove(self.favorite_articles.get(slug=article_slug))
 
     def get_follower_count(self):
-        return len(self.get_followers())
+        return self.get_followers().count()
 
     def get_following_count(self):
-        return len(self.get_followed_profiles())
+        return self.get_followed_profiles().count()
