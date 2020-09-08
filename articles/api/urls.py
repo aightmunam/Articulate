@@ -8,7 +8,7 @@ from .views import ArticleList, ArticleDetail
 app_name = "articles"
 urlpatterns = [
     path('', ArticleList.as_view()),
-    path('<slug:article_slug>/', ArticleDetail.as_view()),
+    path('<slug:slug>/', ArticleDetail.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
