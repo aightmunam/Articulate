@@ -27,7 +27,7 @@ SECRET_KEY = '@*vbs7f#h(2!qhna_((%yuob2174(r8-8v%d1+nuoz@)50hqdt'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'articulated-staging.herokuapp.com'
+    os.environ.get('HOST')
 ]
 
 # Application definition
@@ -80,7 +80,6 @@ WSGI_APPLICATION = 'articulate.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-import os
 
 DATABASES = {
     'default': {
