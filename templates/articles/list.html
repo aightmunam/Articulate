@@ -1,120 +1,105 @@
 {% extends 'base.html' %}
 {% block headtitle %}Articles{% endblock %}
 {% block content %}
-{% load static %}
-{% if not request.user.is_authenticated %}
-<div class="row d-flex justify-content-center pt-5 bg-dark">
-    <div class="col-8  pb-5 text-center">
-        <div class="display-4 text-secondary">
-            Welcome to <span class="text-light">Artic<span class="text-primary">ulate</span></span>
+    {% load static %}
+    {% if not request.user.is_authenticated %}
+        <div class="row d-flex justify-content-center pt-5 bg-dark">
+            <div class="col-8  pb-5 text-center">
+                <div class="display-4 text-secondary">
+                    Welcome to <span class="text-light">Artic<span class="text-primary">ulate</span></span>
+                </div>
+                <div class="h4 text-light mt-3 text-capitalize font-weight-light">
+                    articulate, enlighten, inspire
+                </div>
+            </div>
         </div>
-        <div class="h4 text-light mt-3 text-capitalize font-weight-light">
-            articulate, enlighten, inspire
+    {% endif %}
+    <div class="row d-flex justify-content-center pt-3 mb-3 bg-transparent ">
+        <div class="col-6 ">
+            {% include "components/form.html" with form=search_form form_method="get" button_text="Search" %}
         </div>
     </div>
-</div>
-{% endif %}
-<div class="row d-flex justify-content-center pt-3 mb-3 bg-transparent ">
-    <div class="col-6 ">
-            {% include "components/form.html" with form=search_form form_method="get" button_text="Search"%}
+    <hr class="mb-4">
+    <div class="row">
+        {% if local %}
+            <div class="col-6 text-right text-light mb-3 p-1">
+                <a href="{% url "articles:article_list" %}">
+                    <button class="btn btn-sm  action-btn btn-outline-secondary ">
+                        <i class="ion-eye"> Global Feed </i>
+                    </button>
+                </a>
+            </div>
+            <div class="col-6 text-left text-light mb-3 p-1">
+                <a href="{% url "articles:article_local_feed" %}">
+                    <button class="btn btn-sm action-btn btn-dark">
+                        <i class="ion-ios-arrow-down"> Your Feed </i>
+                    </button>
+                </a>
+            </div>
+        {% else %}
+            <div class="col-6 text-right text-light mb-3 p-1">
+                <a href="{% url "articles:article_list" %}">
+                    <button class="btn btn-sm  action-btn btn-dark">
+                        <i class="ion-ios-arrow-down"> Global Feed </i>
+                    </button>
+                </a>
+            </div>
+            <div class="col-6 text-left text-light mb-3 p-1">
+                <a href="{% url "articles:article_local_feed" %}">
+                    <button class="btn btn-sm action-btn btn-outline-secondary">
+                        <i class="ion-eye"> Your Feed </i>
+                    </button>
+                </a>
+            </div>
+        {% endif %}
     </div>
-</div>
-<hr class="mb-4">
-<div class="row">
-{% if local %}
-    <div class="col-6 text-right text-light mb-3 p-1">
-        <a href="{% url "articles:article_list"  %}">
-            <button class="btn btn-sm  action-btn btn-outline-secondary " >
-                <i class="ion-eye"> Global Feed </i>
-            </button>
-        </a>
-    </div>
-    <div class="col-6 text-left text-light mb-3 p-1">
-        <a href="{% url "articles:article_local_feed" %}">
-            <button class="btn btn-sm action-btn btn-dark" >
-                <i class="ion-ios-arrow-down"> Your Feed </i>
-            </button>
-        </a>
-    </div>
-{% else %}
-    <div class="col-6 text-right text-light mb-3 p-1">
-        <a href="{% url "articles:article_list"  %}">
-            <button class="btn btn-sm  action-btn btn-dark" >
-                <i class="ion-ios-arrow-down"> Global Feed </i>
-            </button>
-        </a>
-    </div>
-    <div class="col-6 text-left text-light mb-3 p-1">
-        <a href="{% url "articles:article_local_feed" %}">
-            <button class="btn btn-sm action-btn btn-outline-secondary" >
-                <i class="ion-eye"> Your Feed </i>
-            </button>
-        </a>
-    </div>
-{% endif %}
-</div>
 
-<div class="container-fluid">
-    <div class="row d-flex justify-content-center">
-        {% if tag %}
-            <div class="col-12 text-center">
-                <p>All the articles tagged by <span class="text-primary">{{tag}}</span> tag</p>
-            </div>
-            <div class="col-12 text-center">
-                <p><span class="text-primary">{{tag.name}} </span> tag has <span class="text-danger">{{tag.click_count}}</span> clicks</p>
-            </div>
-            {% if tag.clicked_by_profile %}
+    <div class="container-fluid">
+        <div class="row d-flex justify-content-center">
+            {% if query %}
                 <div class="col-12 text-center">
-                    <p>
-                        <span class="text-primary">{{tag.name}} </span> tag has been clicked by: <span class="text-danger">
-                            {% for profile_click in tag.clicked_by_profile.all %}
-                                {% if not forloop.last %}
-                                    {{profile_click.username}},
-                                {% else %}
-                                    {{profile_click.username}}
-                                {%endif %}
-                            {% endfor %}
-                        </span>
-                    </p>
+                    <p>Showing results for <span class="text-primary">{{ query }}</span></p>
                 </div>
             {% endif %}
-        {% endif %}
-        {% if query %}
-            <div class="col-12 text-center">
-                <p>Showing results for <span class="text-primary">{{query}}</span></p>
+            <div class="col-10 d-flex justify-content-center">
+                <div class="col-12">
+                    {% for article in articles %}
+                        {% include "components/card.html" with article=article %}
+                    {% empty %}
+                        <div class="col-10 text-center justify-content m-5 py-5 display-3">
+                            <p>There are no articles yet.</p>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-        {% endif %}
-        <div class="col-10 d-flex justify-content-center">
-            <div class="col-12">
-                {% for article in articles %}
-                    {% include "components/card.html" with article=article %}
-                {% empty %}
-                <div class="col-10 text-center justify-content m-5 py-5 display-3">
-                    <p>There are no articles yet.</p>
-                </div>
-                {% endfor %}
+            <div class="col-2 text-center px-4">
+                {% if popular_tags %}
+                    <div class="h3 mb-3 rounded text-center py-3 px-3 border">
+                        Trending tags
+                    </div>
+                    {% for single_tag in popular_tags %}
+                        {% if single_tag == tag %}
+                            <div class="mt-2">
+                                <button class="block btn btn-sm  action-btn btn-dark" disabled>
+                                    <i class="ion-ios-arrow-up"> {{ single_tag.name }} </i>
+                                </button>
+                            </div>
+                        {% else %}
+                            <div class="mt-2">
+                                <a href="{% url "articles:article_list_by_tag" single_tag.slug %}">
+                                    <button class="block btn btn-sm  action-btn btn-outline-secondary">
+                                        <i class="ion-ios-arrow-up"> {{ single_tag.name }} </i>
+                                    </button>
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             </div>
-        </div>
-        <div class="col-2 text-center px-4">
-            {% if popular_tags %}
-                <div class="h3 mb-3 rounded text-center py-3 px-3 border">
-                Trending tags
-                </div>
-                {% for tag in popular_tags %}
-                <div class="mt-2">
-                    <a href="{% url "articles:article_list_by_tag" tag.slug %}">
-                        <button class="block btn btn-sm  action-btn btn-outline-secondary" >
-                            <i class="ion-ios-arrow-up"> {{tag.name}} </i>
-                        </button>
-                    </a>
-                </div>
-                {% endfor %}
-            {% endif %}
         </div>
     </div>
-</div>
-{% if articles %}
-    {% include "components/pagination.html" with page=articles %}
-{% endif %}
+    {% if articles %}
+        {% include "components/pagination.html" with page=articles %}
+    {% endif %}
 
 {% endblock content %}

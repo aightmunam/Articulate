@@ -63,6 +63,9 @@ class Tag(models.Model):
         self.clicked_by_profile.add(Profile)
         self.save()
 
+    def __eq__(self, other):
+        return self.slug == other.slug
+
 
 class Comment(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL,

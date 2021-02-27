@@ -1,19 +1,33 @@
 {% extends 'base.html' %}
 {% block headtitle %}Sign in{% endblock %}
 {% block content %}
-<div class="row d-flex justify-content-center mt-5 border ">
-    {% ifequal auth_status False %}
-    <div class="col-12 text-danger text-center">
-       <p>Invalid username or password</p>
+    <div class="row d-flex justify-content-center mt-5 border ">
+        {% ifequal auth_status False %}
+            <div class="col-12 text-danger text-center">
+                <p>Invalid username or password</p>
+            </div>
+        {% endifequal %}
+        <div class="col-5">
+            {% include "components/form.html" with form_method="post" form=login_form heading_text="Sign in" button_text="Sign in" %}
+        </div>
+        <div class="col-12 d-flex justify-content-center align-content-center mt-2">
+            <button class="btn btn-danger m-2">
+
+                <a href="{% url "social:begin" "google-oauth2" %}">Sign in with Google</a>
+            </button>
+            <button class="btn btn-primary m-2">
+                <a href="#">Login with Facebook
+                </a>
+            </button>
+            <button class="btn btn-info m-2">
+                <a href="#">Login with LinkedIn</a>
+            </button>
+        </div>
+        <div class="col-12 d-flex justify-content-center mt-2">
+            <p>
+                Do not have an account yet? <a class="text-primary" href="{% url "profiles:profile_register" %}"> Sign
+                up</a>
+            </p>
+        </div>
     </div>
-    {% endifequal %}
-    <div class="col-5">
-        {% include "components/form.html" with form_method="post" form=login_form heading_text="Sign in" button_text="Sign in" %}
-    </div>
-    <div class="col-12 d-flex justify-content-center mt-2">
-        <p>
-        Do not have an account yet? <a class="text-primary" href="{% url "profiles:profile_register" %}"> Sign up</a>
-        </p>
-    </div>
-</div>
 {% endblock %}

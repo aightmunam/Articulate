@@ -87,7 +87,7 @@ def profile_edit(request, username):
             current_user.set_password(cleaned_data["password"])
             current_user.save()
             authenticate(request, username=current_user.username, password=current_user.password)
-            login(request, current_user)
+            login(request, current_user, backend='django.contrib.auth.backends.ModelBackend')
             redirect("profiles:profile_detail", username=username)
 
     else:

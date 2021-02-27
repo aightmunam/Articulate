@@ -2,14 +2,28 @@
 {% block headtitle %}Sign up{% endblock %}
 {% block content %}
 
-<div class="row d-flex justify-content-center mt-5 border rounded">
-    <div class="col-5">
-        {% include "components/form.html" with form_method="post" form=register_form heading_text="Register for Articulate" button_text="Sign up" %}
+    <div class="row d-flex justify-content-center mt-5 border rounded">
+        <div class="col-5">
+            {% include "components/form.html" with form_method="post" form=register_form heading_text="Register for Articulate" button_text="Sign up" %}
+        </div>
+        <div class="col-12 d-flex justify-content-center align-content-center mt-2">
+                <button class="btn btn-success m-2">
+                    <a href="{% url "social:begin" "google-oauth2" %}">Sign up with Google</a>
+                </button>
+                <button class="btn btn-primary m-2">
+                    <a href="#">Sign up with Facebook
+                    </a>
+                </button>
+                <button class="btn btn-info m-2">
+                    <a href="#">Sign up with LinkedIn</a>
+                </button>
+        </div>
+        <div class="col-12 d-flex justify-content-center mt-2">
+            <p>
+                Already have an account? <a class="text-primary" href="{% url "profiles:profile_login" %}"> Sign in</a>
+            </p>
+        </div>
+
     </div>
-    <div class="col-12 d-flex justify-content-center mt-2">
-        <p>
-        Already have an account? <a class="text-primary" href="{% url "profiles:profile_login" %}"> Sign in</a>
-        </p>
-    </div>
-</div>
 {% endblock %}
+

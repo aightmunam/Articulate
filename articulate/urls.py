@@ -24,6 +24,7 @@ from articles.views import aritcle_index
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', aritcle_index, name='index'),
+    path('', include('social_django.urls', namespace='social')),
     path('profiles/', include('profiles.urls', namespace='profiles')),
     path('articles/', include('articles.urls', namespace='articles')),
     path('api/', api_root, name='api-root'),
