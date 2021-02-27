@@ -3,6 +3,7 @@ CacheControl==0.12.6
 cachetools==4.2.1
 certifi==2020.12.5
 chardet==4.0.0
+dj-database-url==0.5.0
 Django==3.1.7
 django-cleanup==5.1.0
 django-extensions==3.1.0
@@ -17,10 +18,12 @@ Markdown==3.3.3
 msgpack==1.0.2
 packaging==20.9
 Pillow==8.1.0
+postgres==3.0.0
 proto-plus==1.13.0
 protobuf==3.15.3
 psycopg2==2.8.6
 psycopg2-binary==2.8.6
+psycopg2-pool==1.1
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pyparsing==2.4.7
