@@ -26,7 +26,9 @@ SECRET_KEY = '@*vbs7f#h(2!qhna_((%yuob2174(r8-8v%d1+nuoz@)50hqdt'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'articulated-staging.herokuapp.com'
+]
 
 # Application definition
 
