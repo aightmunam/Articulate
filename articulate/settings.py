@@ -21,7 +21,7 @@ LOGIN_URL = '/profiles/login/'
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '@*vbs7f#h(2!qhna_((%yuob2174(r8-8v%d1+nuoz@)50hqdt'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -86,13 +86,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
+        'USER': os.environ.get('DB_USERNAME'),
         'PASSWORD': os.environ.get('DB_PASS'),
     }
 }
 
 import dj_database_url
-
 db_from_env = dj_database_url.config(conn_max_age=600)
 DATABASES['default'].update(db_from_env)
 
