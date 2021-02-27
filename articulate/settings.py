@@ -28,11 +28,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 AUTH_USER_MODEL = 'profiles.Profile'
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -41,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.postgres',
     'rest_framework',
     'articles',
     'profiles',
@@ -78,21 +75,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'articulate.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
+import os
 DATABASES = {
 
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'articulate',
-        'USER': 'articulate',
-        'PASSWORD': 'articulate',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USERNAME'),
+        'PASSWORD': os.environ.get('DB_PASS'),
         'HOST': 'localhost'
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -133,15 +128,14 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/staticfiles/'              # Used to include static resources in web pages
+STATIC_URL = '/staticfiles/'  # Used to include static resources in web pages
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfies')
 # STATIC_ROOT = '/var/www/static/'     # Used to get static resources from web server
 # MEDIA_URL = '/images/'                # Used to include media items in web pages
 # MEDIA_ROOT = '/var/www/media/'       # Used to get media items from web server
 MEDIA_ROOT = os.path.join(BASE_DIR, 'staticfiles/media/')
 MEDIA_URL = '/media/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles'),]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles'), ]

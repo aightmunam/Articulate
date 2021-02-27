@@ -1,19 +1,14 @@
 import collections
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, Http404, JsonResponse
-from django.db.models import Count
-from django.db.models.query import QuerySet
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import TrigramSimilarity
-from django.dispatch import receiver
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import render, get_object_or_404, redirect
 
-from profiles.models import Profile
+from .forms import ArticleForm, CommentForm, SearchForm
 from .models import Article, Tag, Comment
 from .signals import tag_click
-from .forms import ArticleForm, CommentForm, SearchForm
 
 
 def aritcle_index(request):
@@ -27,14 +22,15 @@ def article_list(request, tag_slug=None, local=False):
             current_user_following = request.user.get_followed_profiles()
             local_feed_articles = []
 
-            following_users_authored_articles = [followed_user.get_authored_articles() for followed_user in current_user_following if followed_user]
+            following_users_authored_articles = [followed_user.get_authored_articles() for followed_user in
+                                                 current_user_following if followed_user]
             if following_users_authored_articles:
                 local_feed_articles = following_users_authored_articles[0]
                 for followed_user_article_qs in following_users_authored_articles:
                     local_feed_articles = (local_feed_articles | followed_user_article_qs)
 
-
-            following_users_starred_articles = [followed_user.get_favorite_articles() for followed_user in current_user_following if followed_user]
+            following_users_starred_articles = [followed_user.get_favorite_articles() for followed_user in
+                                                current_user_following if followed_user]
             if following_users_starred_articles:
                 for followed_users_article in following_users_starred_articles:
                     local_feed_articles = (local_feed_articles | followed_users_article)
@@ -92,7 +88,7 @@ def article_list(request, tag_slug=None, local=False):
     return render(request, "articles/list.html", context={"page": page,
                                                           "articles": articles,
                                                           "tag": tag,
-                                                          "search_form":search_form,
+                                                          "search_form": search_form,
                                                           "query": query,
                                                           "local": local,
                                                           "popular_tags": top_five_most_popular_tags})
@@ -129,7 +125,7 @@ def article_detail(request, article_slug):
                                                             "page": page,
                                                             "comments": comments,
                                                             "new_comment": new_comment,
-                                                            "comment_form": comment_form,})
+                                                            "comment_form": comment_form, })
 
 
 @login_required
@@ -160,7 +156,7 @@ def article_create_new(request):
 
 @login_required
 def article_edit(request, article_slug):
-    current_article =  get_object_or_404(Article, slug=article_slug)
+    current_article = get_object_or_404(Article, slug=article_slug)
     if request.method == 'POST':
         form = ArticleForm(data=request.POST, files=request.FILES or None, instance=current_article)
         if form.is_valid():

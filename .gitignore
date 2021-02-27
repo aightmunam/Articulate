@@ -59,3 +59,13 @@ target/
 # VSCode
 .vscode
 .code-workspace
+
+
+# Virtual Env
+venv/
+
+# ENV Vars
+*.env
+
+# Mac utility files
+*.DS_Store
