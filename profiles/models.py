@@ -1,11 +1,7 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.conf import settings
-from articles.models import Article
-from django.db.models import Count
-from django.db.models.signals import post_delete
-from django.dispatch import receiver
+from django.db import models
 
+from articles.models import Article
 
 
 class Profile(AbstractUser):

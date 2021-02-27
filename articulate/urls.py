@@ -17,9 +17,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+
 from articles.api.views import api_root
 from articles.views import aritcle_index
-from profiles.views import profile_login
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,5 +32,4 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,12 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-
-from django.conf import settings
+from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import LoginForm, SignupForm, UserChangeForm
 from .models import Profile
+
 
 # Create your views here.
 def profile_login(request):
@@ -63,6 +61,7 @@ def profile_favorites(request, username):
                                                             "articles": articles,
                                                             "favorite": True})
 
+
 @login_required
 def profile_follow(request, username, follow=True):
     current_user = request.user
@@ -71,6 +70,7 @@ def profile_follow(request, username, follow=True):
     else:
         current_user.unfollow_profile(username=username)
     return redirect("profiles:profile_detail", username=username)
+
 
 @login_required
 def profile_edit(request, username):

@@ -1,17 +1,13 @@
-import os
-
-from django.db import models
-from django.contrib.auth.models import User
-from django.db.models import Count
-from django.db.models.signals import post_delete
-from django_extensions.db.fields import AutoSlugField
 from django.conf import settings
-from django.dispatch import receiver
+from django.contrib.auth.models import User
+from django.db import models
+from django.db.models import Count
+from django_extensions.db.fields import AutoSlugField
 
 
 class Article(models.Model):
     title = models.CharField(max_length=100)
-    slug = AutoSlugField(('slug'), max_length=50, unique=True, populate_from=('title',))
+    slug = AutoSlugField('slug', max_length=50, unique=True, populate_from=('title',))
     description = models.CharField(max_length=300)
     content = models.TextField()
     # blank = True means not required in Django
@@ -23,7 +19,6 @@ class Article(models.Model):
     tags = models.ManyToManyField('articles.Tag', related_name='articles', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
 
     class Meta:
         ordering = ['created_at']

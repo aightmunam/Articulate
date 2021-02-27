@@ -2,6 +2,7 @@ from django.dispatch import receiver
 
 from .signals import tag_click
 
+
 @receiver(tag_click)
 def update_tag_click_status(sender, tag, profile, **kwargs):
     if tag:
