@@ -1,3 +1,7 @@
+* {
+    text-decoration: none;
+}
+
 body {
     font-family: 'Rubik', sans-serif;
     background: #a71d2aheroku ;
@@ -135,10 +139,10 @@ a:hover {
     padding:2px
 }
 
-.btn.btn-primary {
-    background-color: #ffd369 !important;
-    border: 1px solid #ffd369 !important;
-    color: #fff !important;
+.btn-fb {
+    background-color:#007bff !important;
+    border: 1px solid #007bff !important;
+    color: #a71d2a !important;
 }
 
 .current .text-yellow {
@@ -159,6 +163,10 @@ a:hover {
 
 .banner .btn {
 	opacity: 0.8;
+}
+
+.text-small {
+    font-size: 0.5rem !important;
 }
 
 .banner .btn:hover {

@@ -10,18 +10,16 @@
         <div class="col-5">
             {% include "components/form.html" with form_method="post" form=login_form heading_text="Sign in" button_text="Sign in" %}
         </div>
-        <div class="col-12 d-flex justify-content-center align-content-center mt-2">
-            <button class="btn btn-danger m-2">
-
-                <a href="{% url "social:begin" "google-oauth2" %}">Sign in with Google</a>
-            </button>
-            <button class="btn btn-primary m-2">
-                <a href="#">Login with Facebook
-                </a>
-            </button>
-            <button class="btn btn-info m-2">
-                <a href="#">Login with LinkedIn</a>
-            </button>
+         <div class="col-12 d-flex justify-content-center align-content-center mt-3">
+            <p> Or Sign in with</p>
+        </div>
+        <div class="col-12 d-flex justify-content-center align-content-center mb-3">
+                <button class="btn btn-success mx-1">
+                    <span><a class="text-light" href="{% url "social:begin" "google-oauth2" %}">Google</a></span>
+                </button>
+                <button class="btn btn-info mx-1">
+                    <span><a class="text-light" href="{% url "social:begin" "facebook" %}">Facebook</a></span>
+                </button>
         </div>
         <div class="col-12 d-flex justify-content-center mt-2">
             <p>

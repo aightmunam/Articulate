@@ -66,6 +66,9 @@ class Tag(models.Model):
     def __eq__(self, other):
         return self.slug == other.slug
 
+    def __hash__(self):
+        return super().__hash__()
+
 
 class Comment(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL,

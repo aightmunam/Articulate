@@ -9,13 +9,17 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import os
 
 from pathlib import Path
-import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 LOGIN_URL = '/profiles/login/'
+
+load_dotenv(dotenv_path=os.path.join(BASE_DIR, '.env'))
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -63,6 +67,7 @@ ROOT_URLCONF = 'articulate.urls'
 
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -76,8 +81,13 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.load_extra_data',
 )
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get('GOOGLE_SSO_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get('GOOGLE_SSO_ID')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get('GOOGLE_SSO_SECRET')
+
+SOCIAL_AUTH_FACEBOOK_KEY = os.environ.get('FB_SSO_ID')
+SOCIAL_AUTH_FACEBOOK_SECRET = os.environ.get('FB_SSO_SECRET')
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'articles:article_list'
