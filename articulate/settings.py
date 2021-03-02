@@ -16,7 +16,6 @@ from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
-LOGIN_URL = '/profiles/login/'
 
 load_dotenv(dotenv_path=os.path.join(BASE_DIR, '.env'))
 
@@ -89,10 +88,10 @@ SOCIAL_AUTH_FACEBOOK_SECRET = os.environ.get('FB_SSO_SECRET')
 SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
 
 
-LOGIN_URL = 'login'
+LOGIN_URL = 'profiles:profile_login'
 LOGIN_REDIRECT_URL = 'articles:article_list'
-LOGOUT_URL = 'logout'
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_URL = 'profiles:profile_logout'
+LOGOUT_REDIRECT_URL = 'articles:article_list'
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 TEMPLATES = [
