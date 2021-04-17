@@ -1,21 +1,15 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.conf import settings
-from articles.models import Article
-from django.db.models import Count
-from django.db.models.signals import post_delete
-from django.dispatch import receiver
+from django.db import models
 
+from articles.models import Article
 
 
 class Profile(AbstractUser):
     username = models.CharField(max_length=50, unique=True)
     bio = models.CharField(max_length=100)
     display = models.ImageField(upload_to="profile-display/")
-    followed_profiles = models.ManyToManyField(
-        "self", related_name="followers", blank=True, symmetrical=False)
-    favorite_articles = models.ManyToManyField(
-        "articles.Article", related_name="favorited", blank=True)
+    followed_profiles = models.ManyToManyField("self", related_name="followers", blank=True, symmetrical=False)
+    favorite_articles = models.ManyToManyField("articles.Article", related_name="favorited", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -44,18 +38,15 @@ class Profile(AbstractUser):
             self.followed_profiles.remove(self.followed_profiles.get(username=username))
 
     def is_favorite(self, article_slug):
-        if self.favorite_articles.filter(slug=article_slug).exists():
-            return True
-        return False
+        return self.favorite_articles.filter(slug=article_slug).exists()
 
-    def favorite_article(self, article_slug):
-        article_to_favorite = Article.objects.get(slug=article_slug)
-        if article_to_favorite and not self.is_favorite(article_slug):
-            self.favorite_articles.add(article_to_favorite)
-
-    def unfavorite_article(self, article_slug):
-        if self.is_favorite(article_slug):
-            self.favorite_articles.remove(self.favorite_articles.get(slug=article_slug))
+    def toggle_article_favourite(self, article_slug):
+        article_to_toggle = Article.objects.filter(slug=article_slug).first()
+        if article_to_toggle:
+            if self.is_favorite(article_slug):
+                self.favorite_articles.remove(article_to_toggle)
+            else:
+                self.favorite_articles.add(article_to_toggle)
 
     def get_follower_count(self):
         return self.get_followers().count()

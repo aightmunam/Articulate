@@ -1,22 +1,30 @@
-<nav class="navbar px-md-0 navbar-expand-lg navbar-dark border-bottom border-light ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
-  <div class="container">
-    <a class="navbar-brand" href="/">Artic<i>ulate</i>.</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="oi oi-menu"></span> Menu
-    </button>
+<nav class="navbar px-md-0 navbar-expand-lg navbar-dark border-bottom border-light ftco_navbar bg-dark ftco-navbar-light"
+     id="ftco-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/">Artic<i>ulated</i>.</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
+                aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="oi oi-menu"></span> Menu
+        </button>
 
-    <div class="collapse navbar-collapse" id="ftco-nav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item active"><a href="{%url "articles:article_list" %}" class="nav-link ion-ios-home-outline"> Home</a></li>
-        {% if request.user.is_authenticated %}
-        <li class="nav-item active"><a href="{%url "articles:article_create_new" %}" class="nav-link ion-ios-compose-outline"> New Article</a></li>
-        <li class="nav-item active"><a href="{%url "profiles:profile_detail" request.user.username %}" class="nav-link ion-ios-contact-outline text-warning"> {{request.user.username}}</a></li>
-        <li class="nav-item active"><a href="/profiles/logout/" class="nav-link ion-power text-danger"> log out</a></li>
-        {% else %}
-        <li class="nav-item active"><a href="{%url "profiles:profile_login" %}" class="nav-link text-success ion-log-in"> Sign in</a></li>
-        {% endif %}
+        <div class="collapse navbar-collapse" id="ftco-nav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active"><a href="{% url "articles:article_list" %}"
+                                               class="nav-link ion-ios-home-outline"> Home</a></li>
+                {% if request.user.is_authenticated %}
+                    <li class="nav-item active"><a href="{% url "articles:article_create_new" %}"
+                                                   class="nav-link ion-ios-compose-outline"> New Article</a></li>
+                    <li class="nav-item active"><a href="{% url "profiles:profile_detail" request.user.username %}"
+                                                   class="nav-link ion-ios-contact-outline text-warning"> {{ request.user.username }}</a>
+                    </li>
+                    <li class="nav-item active"><a href="/profiles/logout/" class="nav-link ion-power text-danger"> log
+                        out</a></li>
+                {% else %}
+                    <li class="nav-item active"><a href="{% url "profiles:profile_login" %}"
+                                                   class="nav-link text-success ion-log-in"> Sign in</a></li>
+                {% endif %}
 
-      </ul>
+            </ul>
+        </div>
     </div>
-  </div>
 </nav>

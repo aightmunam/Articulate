@@ -1,13 +1,24 @@
 from django import forms
-from .models import Profile
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
+from .models import Profile
+
+
 class SignupForm(UserCreationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control", "placeholder":"Username"}), label="", )
-    password1 = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder":"Password"}), label="")
-    password2 = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder":"Confirm password"}), label="")
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Username"}),
+        label="",
+    )
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Password"}),
+        label=""
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Confirm password"}),
+        label=""
+    )
 
     class Meta:
         model = Profile
@@ -37,8 +48,14 @@ class SignupForm(UserCreationForm):
 
 
 class LoginForm(forms.Form):
-    username = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control", "placeholder":"Username"}), label="", )
-    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder":"Password"}), label="")
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Username"}),
+        label="",
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Password"}),
+        label=""
+    )
 
     def clean(self):
         password = self.cleaned_data.get("password")
@@ -56,7 +73,6 @@ class LoginForm(forms.Form):
 
 
 class UserChangeForm(forms.ModelForm):
-
     class Meta:
         model = Profile
         fields = ('first_name', 'last_name', 'bio', 'display', 'password')
@@ -71,5 +87,3 @@ class UserChangeForm(forms.ModelForm):
 
         for field in self.fields:
             self.fields[field].label = ""
-
-

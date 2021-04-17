@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block headtitle %}{{ title }}{% endblock %}
+{% block content %}
+    {% include "components/form.html" with form_method="post" form=form heading_text="Edit Article" button_text="Update Article" %}
+{% endblock %}

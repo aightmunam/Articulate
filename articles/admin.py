@@ -1,20 +1,32 @@
+"""
+Admin for articles app
+"""
 from django.contrib import admin
-from django.utils.html import format_html
+
+from .models import Article, Comment, Tag
 
 
-# Register your models here.
-from .models import Article, Tag, Comment
-# Register your models here.
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
+    """
+    Admin for Article
+    """
     list_display = ('title', 'description', 'created_at')
     search_fields = ('title', 'body')
     raw_id_fields = ('author',)
 
+
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
+    """
+    Admin for Tag
+    """
     list_display = ('name', 'created_at')
+
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
+    """
+    Admin for Comment
+    """
     list_display = ('author', 'article', 'body', 'created_at')

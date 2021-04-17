@@ -1,29 +1,27 @@
-import os
-
-from django.db import models
-from django.contrib.auth.models import User
-from django.db.models import Count
-from django.db.models.signals import post_delete
-from django_extensions.db.fields import AutoSlugField
+"""
+Models for articles app
+"""
 from django.conf import settings
-from django.dispatch import receiver
+from django.contrib.auth.models import User
+from django.db import models
+from django.db.models import Count
+from django.urls import reverse
+from django_extensions.db.fields import AutoSlugField
 
 
 class Article(models.Model):
+    """
+    Model for Article
+    """
     title = models.CharField(max_length=100)
-    slug = AutoSlugField(('slug'), max_length=50, unique=True, populate_from=('title',))
+    slug = AutoSlugField('slug', max_length=50, unique=True, populate_from=('title',))
     description = models.CharField(max_length=300)
     content = models.TextField()
-    # blank = True means not required in Django
-    # null = True means not required in the database
     cover_image = models.ImageField(upload_to="article-cover/", blank=True, null=True)
-    author = models.ForeignKey(settings.AUTH_USER_MODEL,
-                               on_delete=models.CASCADE,
-                               related_name='authored_articles')
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='authored_articles')
     tags = models.ManyToManyField('articles.Tag', related_name='articles', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
 
     class Meta:
         ordering = ['created_at']
@@ -46,14 +44,18 @@ class Article(models.Model):
     def get_favorited_count(self):
         return self.get_authors_favorited().count()
 
+    def get_absolute_url(self):
+        return reverse('articles:article_detail', kwargs={'article_slug': self.slug})
+
 
 class Tag(models.Model):
+    """
+    Model for Tag
+    """
     name = models.CharField(max_length=25, unique=True)
-    slug = AutoSlugField(('slug'), max_length=25, populate_from=('name',))
+    slug = AutoSlugField('slug', max_length=25, populate_from=('name',))
     click_count = models.IntegerField(default=0)
-    clicked_by_profile = models.ManyToManyField(settings.AUTH_USER_MODEL,
-                                                related_name='tags_clicked',
-                                                blank=True)
+    clicked_by_profile = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='tags_clicked', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -68,16 +70,19 @@ class Tag(models.Model):
         self.clicked_by_profile.add(Profile)
         self.save()
 
+    def __eq__(self, other):
+        return self.slug == other.slug
+
+    def __hash__(self):
+        return super().__hash__()
+
 
 class Comment(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL,
-                               on_delete=models.CASCADE,
-                               related_name='comments')
-
-    article = models.ForeignKey(Article,
-                                on_delete=models.CASCADE,
-                                related_name='comments')
-
+    """
+    Model for Comment
+    """
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comments')
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
     body = models.TextField()
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -87,4 +92,4 @@ class Comment(models.Model):
         ordering = ('created_at',)
 
     def __str__(self):
-        return "Comment by {} on {}".format(self.author, self.article)
+        return f'{self.body[:15]}...'

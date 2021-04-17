@@ -17,13 +17,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+
 from articles.api.views import api_root
 from articles.views import aritcle_index
-from profiles.views import profile_login
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', aritcle_index, name='index'),
+    path('', include('social_django.urls', namespace='social')),
     path('profiles/', include('profiles.urls', namespace='profiles')),
     path('articles/', include('articles.urls', namespace='articles')),
     path('api/', api_root, name='api-root'),
@@ -32,5 +33,4 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
