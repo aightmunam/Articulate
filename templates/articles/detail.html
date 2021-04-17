@@ -26,7 +26,7 @@
     {% ifnotequal  article.author request.user %}
         {% if article not in request.user.get_favorite_articles %}
         <div class="col-7 text-center text-secondary">
-            <a href="{% url "articles:article_favorite" article.slug %}">
+            <a href="{% url "articles:article_rate" article.slug 'favourite' %}">
                 <button class="btn btn-sm btn-outline-danger action-btn">
                     <i class="ion-heart" href="#"> Favorite Article
                         <span class="text-light badge badge-pill badge-danger px-1 font-weight-bolder rounded"> {{ article.get_favorited_count }}</span>
@@ -36,7 +36,7 @@
         </div>
         {% elif article in request.user.get_favorite_articles %}
         <div class="col-7 text-center text-light">
-            <a href="{% url "articles:article_unfavorite" article.slug %}">
+            <a href="{% url "articles:article_rate" article.slug 'unfavourite' %}">
                 <button class="btn btn-sm btn-outline-danger action-btn">
                     <i class="ion-heart-broken" href="#"> Unfavorite Article
                         <span class="text-danger badge badge-pill badge-dark font-weight-bolder rounded"> {{ article.get_favorited_count }}</span>

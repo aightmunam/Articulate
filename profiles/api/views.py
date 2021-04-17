@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from profiles.models import Profile
 from profiles.api.serializers import ProfileSerializer
+from profiles.models import Profile
 
 
 class ProfileViewSet(viewsets.ReadOnlyModelViewSet):

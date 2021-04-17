@@ -1,10 +1,8 @@
 from django.contrib import admin
-from django.urls import path, include
-
+from django.urls import include, path
 from rest_framework.urlpatterns import format_suffix_patterns
 
 from .views import ArticleViewSet, api_root
-
 
 article_list = ArticleViewSet.as_view({
     'get': 'list',

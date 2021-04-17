@@ -56,6 +56,9 @@ target/
 # PyCharm
 .idea
 
+# Pylint
+pylintrc
+
 # VSCode
 .vscode
 .code-workspace
@@ -69,3 +72,14 @@ venv/
 
 # Mac utility files
 *.DS_Store
+
+# isort
+*.isort.cfg
+
+# Makefile
+Makefile
+
+node_modules/
+
+package-lock.json
+
