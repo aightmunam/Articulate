@@ -1,11 +1,10 @@
-from rest_framework import viewsets
-from rest_framework import permissions
+from rest_framework import permissions, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from articles.models import Article
 from articles.api.serializers import ArticleSerializer
+from articles.models import Article
 
 
 @api_view(['GET'])

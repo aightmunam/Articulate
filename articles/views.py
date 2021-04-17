@@ -1,21 +1,27 @@
+"""
+Views for the articles app
+"""
 import collections
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.postgres.search import TrigramSimilarity
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.shortcuts import render, get_object_or_404, redirect
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
+from django.views import View
+from django.views.generic import CreateView, DeleteView, FormView, UpdateView
+from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from .forms import ArticleForm, CommentForm, SearchForm
-from .models import Article, Tag, Comment
+from .models import Article, Comment, Tag
 from .signals import tag_click
 
 
-def aritcle_index(request):
-    return redirect("articles:article_list")
-
-
 def article_list(request, tag_slug=None, local=False):
+    """
+    Lists all the articles, add query functionality
+    """
     feed_articles = None
     if local:
         if request.user.is_authenticated:
@@ -69,7 +75,8 @@ def article_list(request, tag_slug=None, local=False):
             search_form = SearchForm(request.GET)
             if search_form.is_valid():
                 query = search_form.cleaned_data['query']
-                feed_articles = Article.objects.annotate(similarity=TrigramSimilarity('title', query),).filter(similarity__gt=0.1).order_by('-similarity')
+                feed_articles = Article.objects.annotate(similarity=TrigramSimilarity('title', query), ).filter(
+                    similarity__gt=0.1).order_by('-similarity')
 
         if tag_slug:
             tag = get_object_or_404(Tag, slug=tag_slug)
@@ -85,125 +92,200 @@ def article_list(request, tag_slug=None, local=False):
         except EmptyPage:
             articles = paginator.page(paginator.num_pages)
 
-    return render(request, "articles/list.html", context={"page": page,
-                                                          "articles": articles,
-                                                          "tag": tag,
-                                                          "search_form": search_form,
-                                                          "query": query,
-                                                          "local": local,
-                                                          "popular_tags": top_five_most_popular_tags})
+    return render(request, 'articles/list.html', {
+        'page': page, 'articles': articles, 'tag': tag, 'search_form': search_form, 'query': query, 'local': local,
+        'popular_tags': top_five_most_popular_tags
+    })
 
 
-def article_detail(request, article_slug):
-    article = get_object_or_404(Article, slug=article_slug)
-    new_comment = None
-    if request.method == 'POST':
-        if request.user.is_authenticated:
-            comment_form = CommentForm(data=request.POST)
-            if comment_form.is_valid():
-                new_comment = comment_form.save(commit=False)
-                new_comment.article = article
-                new_comment.author = request.user
-                new_comment.save()
-        else:
-            return redirect("profiles:profile_login")
-    else:
-        comment_form = CommentForm()
+class ArticleDetailView(View):
+    """
+    View to handle the Article detail page
+    """
 
-    comments = article.get_all_comments()
+    def get(self, request, *args, **kwargs):
+        view = ArticleDetailDisplay.as_view()
+        return view(request, *args, **kwargs)
 
-    paginator = Paginator(comments, 5)
-    page = request.GET.get('page')
-    try:
-        comments = paginator.page(page)
-    except PageNotAnInteger:
-        comments = paginator.page(1)
-    except EmptyPage:
-        comments = paginator.page(paginator.num_pages)
-
-    return render(request, "articles/detail.html", context={"article": article,
-                                                            "page": page,
-                                                            "comments": comments,
-                                                            "new_comment": new_comment,
-                                                            "comment_form": comment_form, })
+    def post(self, request, *args, **kwargs):
+        view = ArticleDetailFormView.as_view()
+        return view(request, *args, **kwargs)
 
 
-@login_required
-def article_create_new(request):
-    if request.method == 'POST':
-        form = ArticleForm(data=request.POST, files=request.FILES)
-        if form.is_valid():
-            tags = form.cleaned_data["tags"]
-            tag_list = tags.split(',')
-            obj = form.save(commit=False)
-            obj.author = request.user
-            obj.save()
-            for tag in tag_list:
-                tag = tag.lower()
-                tag_qs = Tag.objects.all().filter(name=tag)
-                if tag_qs:
-                    for tag_obj in tag_qs:
-                        obj.tags.add(tag_obj)
-                else:
-                    obj.tags.add(Tag.objects.create(name=tag))
+class ArticleDetailFormView(LoginRequiredMixin, SingleObjectMixin, FormView):
+    """
+    Article detail view to handle post requests for embedded form
+    """
 
-            return redirect('articles:article_detail', article_slug=obj.slug)
-    else:
-        form = ArticleForm()
+    form_class = CommentForm
+    model = Article
+    slug_url_kwarg = 'article_slug'
+    template_name = 'articles/detail.html'
 
-    return render(request, "articles/create_new.html", context={"article_form": form})
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(request=self.request, article=self.object)
+        return kwargs
 
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().post(request, *args, **kwargs)
 
-@login_required
-def article_edit(request, article_slug):
-    current_article = get_object_or_404(Article, slug=article_slug)
-    if request.method == 'POST':
-        form = ArticleForm(data=request.POST, files=request.FILES or None, instance=current_article)
-        if form.is_valid():
-            cleaned_data = form.cleaned_data
-            current_article.title = cleaned_data['title']
-            current_article.description = cleaned_data['description']
-            current_article.content = cleaned_data['content']
-            current_article.cover_image.file = cleaned_data['cover_image']
-            current_article.tags.clear()
-            tags = cleaned_data["tags"]
-            tag_list = tags.split(',')
-            for tag in tag_list:
-                tag = tag.lower()
-                tag_obj, _ = Tag.objects.get_or_create(name=tag)
-                if tag_obj not in current_article.tags.all():
-                    current_article.tags.add(tag_obj)
-            current_article.save()
+    def form_valid(self, form):
+        form.save()
+        return super(ArticleDetailFormView, self).form_valid(form)
 
-            return redirect('articles:article_detail', article_slug=current_article.slug)
-    else:
-        tags = ", ".join([tag.name for tag in current_article.tags.all() if tag])
-        form = ArticleForm(initial={'title': current_article.title,
-                                    'description': current_article.description,
-                                    'content': current_article.content,
-                                    'cover_image': current_article.cover_image,
-                                    'tags': tags})
-
-    return render(request, "articles/edit_article.html", context={"article_form": form})
+    def get_success_url(self):
+        return reverse('articles:article_detail', kwargs={'article_slug': self.object.slug})
 
 
-@login_required
-def article_delete(request, article_slug):
-    get_object_or_404(Article, slug=article_slug).delete()
-    return redirect("articles:article_list")
+class ArticleDetailDisplay(DetailView):
+    """
+    View for the detail page of Article
+    """
+
+    model = Article
+    slug_url_kwarg = 'article_slug'
+    template_name = 'articles/detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ArticleDetailDisplay, self).get_context_data()
+        comments = self.object.get_all_comments()
+        paginator = Paginator(comments, 5)
+
+        page = self.request.GET.get('page')
+        try:
+            comments = paginator.page(page)
+        except PageNotAnInteger:
+            comments = paginator.page(1)
+        except EmptyPage:
+            comments = paginator.page(paginator.num_pages)
+
+        context.update({
+            'comment_form': CommentForm(),
+            'page': page,
+            'comments': comments,
+        })
+
+        return context
 
 
-@login_required
-def article_delete_comment(request, article_slug, comment_id):
-    get_object_or_404(Comment, id=comment_id).delete()
-    return redirect("articles:article_detail", article_slug=article_slug)
+class ArticleCreateView(LoginRequiredMixin, CreateView):
+    """
+    View to create a new article
+    """
+
+    form_class = ArticleForm
+    model = Article
+    slug_url_kwarg = 'article_slug'
+    template_name_suffix = '_form'
+
+    def get_form_kwargs(self, *args, **kwargs):
+        """
+        Add request object to the form
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
 
 
-@login_required
-def article_favorite(request, article_slug, favorite=True):
-    current_user = request.user
-    if favorite:
-        current_user.favorite_article(article_slug=article_slug)
-    else:
-        current_user.unfavorite_article(article_slug=article_slug)
-    return redirect('articles:article_detail', article_slug=article_slug)
+class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    View to update an Article
+    """
+
+    form_class = ArticleForm
+    model = Article
+    slug_url_kwarg = 'article_slug'
+    template_name_suffix = '_form'
+
+    def test_func(self):
+        """
+        Only allow deletion if the authenticated user is the author of the article
+        """
+        article_slug = self.kwargs.get('article_slug')
+        return Article.objects.filter(slug=article_slug, author=self.request.user).exists()
+
+    def get_form_kwargs(self, *args, **kwargs):
+        """
+        Add request object to the form
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def get(self, request, *args, **kwargs):
+        """
+        Send the context data to the template for rendering.
+
+        Returns:
+            HttpResponse object.
+        """
+        self.object = self.get_object()
+        tags = ", ".join([tag.name for tag in self.object.tags.all() if tag])
+
+        form = self.form_class(initial={'title': self.object.title,
+                                        'description': self.object.description,
+                                        'content': self.object.content,
+                                        'cover_image': self.object.cover_image,
+                                        'tags': tags})
+
+        return render(request, 'articles/article_form.html', {'form': form})
+
+
+class ArticleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    View to delete an Article
+    """
+
+    model = Article
+    slug_url_kwarg = 'article_slug'
+    success_url = reverse_lazy('articles:article_list')
+    template_name = 'components/confirm_delete.html'
+
+    def test_func(self):
+        """
+        Only allow deletion if the authenticated user is the author of the article
+        """
+        article_slug = self.kwargs.get('article_slug')
+        return Article.objects.filter(slug=article_slug, author=self.request.user).exists()
+
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    View to delete a Comment on an Article
+    """
+
+    model = Comment
+    pk_url_kwarg = 'comment_id'
+    template_name = 'components/confirm_delete.html'
+
+    def test_func(self):
+        """
+        Only allow delete if the logged in user is either the author of the comment or the article
+        """
+        comment_id = self.kwargs.get('comment_id')
+        article_slug = self.kwargs.get('article_slug')
+
+        is_comment_author = Comment.objects.filter(id=comment_id, author=self.request.user).exists()
+        is_article_author = Article.objects.filter(slug=article_slug, author=self.request.user).exists()
+
+        return is_article_author or is_comment_author
+
+    def get_success_url(self):
+        article_slug = self.kwargs.get('article_slug')
+        return reverse_lazy('articles:article_detail', kwargs={'article_slug': article_slug})
+
+
+class ArticleRateView(LoginRequiredMixin, SingleObjectMixin, View):
+    """
+    View that handles the favourite and un-favourite functionality of an article
+    """
+
+    model = Article
+
+    def get(self, request, slug, rate):  # pylint: disable=unused-argument
+        self.object = self.get_object()
+        self.request.user.toggle_article_favourite(slug)
+
+        return redirect('articles:article_detail', article_slug=slug)

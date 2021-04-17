@@ -1,0 +1,4 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% include "components/form.html" with form_method="post" form=comment_form heading_text="Are you sure you want to continue?" button_text="Delete"%}
+{% endblock %}

@@ -1,7 +1,9 @@
 from rest_framework import serializers
 
-from ..models import Article, Tag, Comment
 from profiles.api.serializers import ProfileSerializer
+
+from ..models import Article, Comment, Tag
+
 
 class ArticleSerializer(serializers.ModelSerializer):
     # author = ProfileSerializer(read_only=True)
