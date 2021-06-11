@@ -2,7 +2,6 @@
 Models for articles app
 """
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Count
 from django.urls import reverse
@@ -80,8 +79,6 @@ class Tag(models.Model):
     def __eq__(self, other):
         return self.slug == other.slug
 
-    def __hash__(self):
-        return super().__hash__()
 
 
 class Comment(models.Model):
