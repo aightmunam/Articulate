@@ -5,9 +5,15 @@ from articles.models import Article
 
 
 class Profile(AbstractUser):
+    PROFILE_IMG_PLACEHOLDER_URL = 'https://cdn.pixabay.com/photo/2016/08/31/11/54/user-1633249_1280.png'
     username = models.CharField(max_length=50, unique=True)
     bio = models.CharField(max_length=100)
-    display = models.ImageField(upload_to="profile-display/")
+    display = models.URLField(
+        blank=True,
+        default=PROFILE_IMG_PLACEHOLDER_URL,
+        max_length=255,
+        verbose_name='Display picture url'
+    )
     followed_profiles = models.ManyToManyField("self", related_name="followers", blank=True, symmetrical=False)
     favorite_articles = models.ManyToManyField("articles.Article", related_name="favorited", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

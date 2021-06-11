@@ -26,39 +26,23 @@ class ArticleForm(forms.ModelForm):
 
         self.fields['title'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Article Title'})
         self.fields['description'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Write a short description'})
+            {'class': 'form-control', 'placeholder': 'Write a short description'}
+        )
         self.fields['content'].widget.attrs.update(
-            {'class': 'form-control', 'placeholder': 'Write your article (in markdown)'})
-        self.fields['cover_image'].widget.attrs.update({'placeholder': 'Image'})
+            {'class': 'form-control', 'placeholder': 'Write your article (in markdown)'}
+        )
+        self.fields['cover_image'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Image url'})
         self.fields['tags'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Comma seperated Tags'})
 
         for field in self.fields:
             self.fields[field].label = ''
-
-    def clean_title(self):
-        """
-        Validate title length
-        """
-        title = self.cleaned_data.get('title')
-        if len(title) > 100:
-            raise forms.ValidationError('The title is too long')
-        return title
-
-    def clean_description(self):
-        """
-        Validate description length
-        """
-        description = self.cleaned_data.get('description')
-        if len(description) > 350:
-            raise forms.ValidationError('The description is too long')
-        return description
 
     def clean_tags(self):
         """
         Check if no empty strings are being sent as a tag
         """
         tags = self.cleaned_data['tags']
-        tag_names = tags.split(',')
+        tag_names = tags.strip().split(',')
         for tag_name in tag_names:
             if not tag_name.strip():
                 raise forms.ValidationError('The tags must be non-empty and separated by commas')
@@ -70,22 +54,21 @@ class ArticleForm(forms.ModelForm):
         Override save method to convert all the tag name strings into Tag objects and add it to m2m field with the
         current object
         """
-        instance = super().save(commit=False)
+        article_instance = super().save(commit=False)
         if commit:
-            instance.author = self.request.user
-            instance.save()
+            article_instance.author = self.request.user
+            article_instance.save()
 
         tags = self.cleaned_data['tags']
         tag_names = [tag.strip().lower() for tag in tags.split(',') if tag and tag.strip()]
 
         for tag_name in tag_names:
             tag, _ = Tag.objects.get_or_create(name=tag_name)
-            if not instance.tags.filter(name=tag.name).exists():
-                instance.tags.add(tag)
+            if not article_instance.tags.filter(name=tag.name).exists():
+                article_instance.tags.add(tag)
 
-        instance.tags.remove(*instance.tags.filter(~Q(name__in=tag_names)))
-
-        return instance
+        article_instance.tags.remove(*article_instance.tags.filter(~Q(name__in=tag_names)))
+        return article_instance
 
 
 class CommentForm(forms.ModelForm):

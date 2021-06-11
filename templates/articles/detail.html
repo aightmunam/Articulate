@@ -10,11 +10,7 @@
         </div>
     </div>
     <div class="col-12 text-center mb-2">
-        {% if article.author.display %}
-        <img src="{{ article.author.display.url }}" style="object-fit: cover; vertical-align:middle;width: 80px;height: 80px;border-radius: 50%;" class="avatar" />
-        {% else %}
-        <img src="{% static 'images/roman_empire.jpg' %}" style="object-fit: cover; vertical-align:middle;width: 80px;height: 80px;border-radius: 50%;" class="avatar" />
-        {% endif %}
+        <img src="{{ article.author.display }}" style="object-fit: cover; vertical-align:middle;width: 80px;height: 80px;border-radius: 50%;" class="avatar" />
     </div>
     <div class="col-7 text-center text-secondary">
         <span class="ion-at"></span><a class="text-primary" href="{% url "profiles:profile_detail" article.author %}">{{article.author}}</a>
@@ -75,13 +71,7 @@
 
 <div class="row d-d-flex justify-content-center">
     <div class="col-5 mb-5 mt-4">
-        {% if article.cover_image %}
-        <img class="img-fluid w-100 rounded mx-auto d-block"
-            src="{{ article.cover_image.url }}" alt="">
-        {% else %}
-        <img class="img-fluid w-100 rounded mx-auto d-block"
-        src="{% static 'images/roman_empire.jpg' %}" alt="">
-        {% endif %}
+        <img class="img-fluid w-100 rounded mx-auto d-block" src="{{ article.cover_image }}" alt="cover-image">
     </div>
 </div>
 

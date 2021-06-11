@@ -82,8 +82,15 @@ class UserChangeForm(forms.ModelForm):
         self.fields['first_name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'First Name'})
         self.fields['last_name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Last Name'})
         self.fields['bio'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Bio'})
-        self.fields['display'].widget.attrs.update({'placeholder': 'Display Image'})
+        self.fields['display'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Display Image'})
         self.fields['password'].widget.attrs.update({'class': 'form-control', 'placeholder': 'New Password'})
 
         for field in self.fields:
             self.fields[field].label = ""
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
