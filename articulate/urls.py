@@ -5,13 +5,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import RedirectView
 
 from articles.api.views import api_root
-from articles.views import article_list
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', article_list, name='index'),
+    path('', RedirectView.as_view(url='articles/'), name='index'),
     path('', include('social_django.urls', namespace='social')),
     path('profiles/', include('profiles.urls', namespace='profiles')),
     path('articles/', include('articles.urls', namespace='articles')),

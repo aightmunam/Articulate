@@ -2,7 +2,6 @@
 Models for articles app
 """
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Count
 from django.urls import reverse
@@ -13,11 +12,18 @@ class Article(models.Model):
     """
     Model for Article
     """
+    COVER_IMG_PLACEHOLDER_URL = 'https://cdn.pixabay.com/photo/2019/09/30/14/29/books-4515917_1280.jpg'
+
     title = models.CharField(max_length=100)
     slug = AutoSlugField('slug', max_length=50, unique=True, populate_from=('title',))
     description = models.CharField(max_length=300)
     content = models.TextField()
-    cover_image = models.ImageField(upload_to="article-cover/", blank=True, null=True)
+    cover_image = models.URLField(
+        blank=True,
+        default=COVER_IMG_PLACEHOLDER_URL,
+        max_length=255,
+        verbose_name='Cover Image Url'
+    )
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='authored_articles')
     tags = models.ManyToManyField('articles.Tag', related_name='articles', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -73,8 +79,6 @@ class Tag(models.Model):
     def __eq__(self, other):
         return self.slug == other.slug
 
-    def __hash__(self):
-        return super().__hash__()
 
 
 class Comment(models.Model):

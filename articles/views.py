@@ -1,101 +1,79 @@
 """
 Views for the articles app
 """
-import collections
-
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, DeleteView, FormView, UpdateView
+from django.views.generic import (CreateView, DeleteView, FormView, ListView,
+                                  UpdateView)
 from django.views.generic.detail import DetailView, SingleObjectMixin
+from django.views.generic.edit import FormMixin
 
 from .forms import ArticleForm, CommentForm, SearchForm
+from .helpers import (
+    get_articles_liked_and_authored_by_followed_profiles,
+    get_articles_tagged_by_given_tag,
+    get_most_similar_articles_based_on_trigram_similarity,
+    get_top_n_most_popular_tags
+)
 from .models import Article, Comment, Tag
-from .signals import tag_click
 
 
-def article_list(request, tag_slug=None, local=False):
+class ArticleListView(FormMixin, ListView):
     """
-    Lists all the articles, add query functionality
+    View to handle all the data of the index page
     """
-    feed_articles = None
-    if local:
-        if request.user.is_authenticated:
-            current_user_following = request.user.get_followed_profiles()
-            local_feed_articles = []
+    model = Article
+    template_name = 'articles/list.html'
+    paginate_by = 3
+    form_class = SearchForm
+    context_object_name = 'articles'
 
-            following_users_authored_articles = [followed_user.get_authored_articles() for followed_user in
-                                                 current_user_following if followed_user]
-            if following_users_authored_articles:
-                local_feed_articles = following_users_authored_articles[0]
-                for followed_user_article_qs in following_users_authored_articles:
-                    local_feed_articles = (local_feed_articles | followed_user_article_qs)
+    def get_queryset(self):
+        feed_articles = self.get_feed_articles()
 
-            following_users_starred_articles = [followed_user.get_favorite_articles() for followed_user in
-                                                current_user_following if followed_user]
-            if following_users_starred_articles:
-                for followed_users_article in following_users_starred_articles:
-                    local_feed_articles = (local_feed_articles | followed_users_article)
-
-            if local_feed_articles:
-                feed_articles = local_feed_articles.distinct().order_by('-created_at').exclude(author=request.user)
-            else:
-                feed_articles = local_feed_articles
-        else:
-            return redirect(settings.LOGIN_URL)
-    else:
-        global_feed_articles = Article.objects.all().order_by('-created_at')
-        feed_articles = global_feed_articles
-
-    tags_in_feed_articles = None
-    if feed_articles:
-        for article in feed_articles:
-            if article:
-                if tags_in_feed_articles:
-                    tags_in_feed_articles = tags_in_feed_articles | article.tags.all()
-                else:
-                    tags_in_feed_articles = article.tags.all()
-        popular_tags = collections.Counter(tags_in_feed_articles)
-        top_five_most_popular_tags = [popular_tag for popular_tag, tag_pop in popular_tags.most_common(5)]
-    else:
-        top_five_most_popular_tags = []
-
-    search_form = SearchForm()
-    tag = None
-    query = None
-    page = None
-    articles = None
-
-    if feed_articles:
-        if 'query' in request.GET:
-            search_form = SearchForm(request.GET)
+        if 'query' in self.request.GET:
+            search_form = SearchForm(self.request.GET)
             if search_form.is_valid():
-                query = search_form.cleaned_data['query']
-                feed_articles = Article.objects.annotate(similarity=TrigramSimilarity('title', query), ).filter(
-                    similarity__gt=0.1).order_by('-similarity')
+                search_query = search_form.cleaned_data['query']
+                feed_articles = get_most_similar_articles_based_on_trigram_similarity(search_query)
 
-        if tag_slug:
-            tag = get_object_or_404(Tag, slug=tag_slug)
-            tag_click.send(sender=Tag, tag=tag, profile=request.user)
-            feed_articles = feed_articles.filter(tags__in=[tag])
+        tag_slug_query = self.kwargs.get('tag_slug')
+        if tag_slug_query:
+            feed_articles = get_articles_tagged_by_given_tag(feed_articles, tag_slug_query)
 
-        paginator = Paginator(feed_articles, 4)
-        page = request.GET.get('page')
-        try:
-            articles = paginator.page(page)
-        except PageNotAnInteger:
-            articles = paginator.page(1)
-        except EmptyPage:
-            articles = paginator.page(paginator.num_pages)
+        return feed_articles
 
-    return render(request, 'articles/list.html', {
-        'page': page, 'articles': articles, 'tag': tag, 'search_form': search_form, 'query': query, 'local': local,
-        'popular_tags': top_five_most_popular_tags
-    })
+    def get_context_data(self, **kwargs):
+        context = super(ArticleListView, self).get_context_data(**kwargs)
+        context.update({
+            'popular_tags': get_top_n_most_popular_tags(self.get_queryset(), 5),
+            'search_form': self.get_form(),
+            'query': self.request.GET.get('query'),
+            'local': self.kwargs.get('local'),
+            'tag': self.kwargs.get('tag_slug')
+        })
+
+        return context
+
+    def get_feed_articles(self):
+        """
+        Gets the user's local feed if there is a authenticated user otherwise returns the
+        feed common to all users.
+
+        Returns:
+            QuerySet: A queryset containing articles to be shown in the newsfeed
+        """
+        if self.kwargs.get('local'):
+            if self.request.user.is_authenticated:
+                return get_articles_liked_and_authored_by_followed_profiles(self.request.user)
+
+        return Article.objects.all().order_by('-created_at').select_related('author').prefetch_related('tags')
 
 
 class ArticleDetailView(View):

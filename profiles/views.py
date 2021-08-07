@@ -76,16 +76,10 @@ def profile_follow(request, username, follow=True):
 def profile_edit(request, username):
     current_user = request.user
 
-    form = UserChangeForm(data=request.POST or None, files=request.FILES or None, instance=current_user)
+    form = UserChangeForm(data=request.POST or None, instance=current_user)
     if request.method == 'POST':
         if form.is_valid():
-            cleaned_data = form.cleaned_data
-            current_user.first_name = cleaned_data["first_name"]
-            current_user.last_name = cleaned_data["last_name"]
-            current_user.bio = cleaned_data["bio"]
-            current_user.display.file = cleaned_data["display"]
-            current_user.set_password(cleaned_data["password"])
-            current_user.save()
+            form.save()
             authenticate(request, username=current_user.username, password=current_user.password)
             login(request, current_user, backend='django.contrib.auth.backends.ModelBackend')
             redirect("profiles:profile_detail", username=username)

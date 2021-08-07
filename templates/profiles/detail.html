@@ -5,11 +5,7 @@
 {% block content %}
 <div class="row d-flex justify-content-center border-bottom pt-3 mb-3 bg-dark">
     <div class="col-12 text-center mb-2">
-        {% if profile.display %}
-        <img src="{{ profile.display.url }}" style="object-fit: cover;vertical-align:middle;width: 100px;height: 100px;border-radius: 50%;" class="avatar" />
-        {% else %}
-        <img src="{% static 'images/roman_empire.jpg' %}" style="object-fit: cover;vertical-align:middle;width: 100px;height: 100px;border-radius: 50%;" class="avatar" />
-        {% endif %}
+        <img src="{{ profile.display }}" style="object-fit: cover;vertical-align:middle;width: 100px;height: 100px;border-radius: 50%;" class="avatar" />
     </div>
     <div class="col-7 text-center text-secondary m-2">
         <span class="text-secondary ion-at "></span><a class="text-primary" href="{%url "profiles:profile_detail" profile.username %}">{{profile.username}}</a>
