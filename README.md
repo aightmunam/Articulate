@@ -1,7 +1,7 @@
 # Articulate
 
 
-Articlulate is a Django based application that allows a user to create their articles, favourite other articles. Follow other authors, have a customized feed. It is a place where one may articulate their ideas and present them to the world.
+Articlulate is a Django based application that allows a user to create an account (SSO with facebook, google), create their articles, favourite other articles. Follow other authors, have a customized feed. It is a place where one may articulate their ideas and present them to the world.
 
 The project revolves around the following ideas:
 
